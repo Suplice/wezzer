@@ -74,6 +74,15 @@ const SignIn: React.FC = () => {
           <div className="w-full">
             <SocialAuthButtons />
           </div>
+          <div className="flex md:flex-row flex-col ">
+            <p className="mt-3">Didn't register yet?</p>
+            <a
+              href="/signup"
+              className="text-blue-500 hover:text-blue-700 md:ml-1 md:mt-3"
+            >
+              Create new account here.
+            </a>
+          </div>
         </motion.div>
         <div className="font-semibold mt-5 pb-3">
           &#169; Wezzer 2024, all rights reserved.
@@ -86,7 +95,7 @@ const SignIn: React.FC = () => {
         </div>
       </div>
       <div className="md:w-1/2 hidden md:flex justify-center items-center min-h-screen h-full bg-sky-600 px-5 fixed right-0">
-        <img src="/SignInImage.jpg " className="rounded-lg w-[450px]"></img>
+        <img src="/SignInImage.jpg" className="rounded-lg w-[450px]"></img>
       </div>
     </div>
   );

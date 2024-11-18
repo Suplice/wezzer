@@ -109,6 +109,16 @@ const SignUp: React.FC = () => {
           <div className="w-full">
             <SocialAuthButtons />
           </div>
+
+          <div className="flex md:flex-row flex-col ">
+            <p className="mt-3">Already have an account?</p>
+            <a
+              href="/login"
+              className="text-blue-500 hover:text-blue-700 md:ml-1 md:mt-3"
+            >
+              Log in here.
+            </a>
+          </div>
         </motion.div>
         <div className="font-semibold mt-5 pb-3">
           &#169; Wezzer 2024, all rights reserved.
