@@ -37,10 +37,10 @@ const SignIn: React.FC = () => {
             <label className="flex items-center text-xl font-semibold mt-2">
               Password <p className="text-red-700 ml-1"> *</p>
             </label>
-            <div className="border h-12 rounded-sm outline-none pl-4  focus:border-cyan-600 transition-all duration-150 flex items-center">
+            <div className="border h-12 rounded-sm outline-none pl-4  focus-within:border-cyan-600 transition-all duration-150 flex items-center">
               <input
                 type={isPasswordVisible ? "text" : "password"}
-                className="   outline-none  text-xl w-full focus:border-cyan-600 transition-all duration-150"
+                className="outline-none  text-xl w-full focus:border-cyan-600 transition-all duration-150"
               ></input>
               {isPasswordVisible ? (
                 <FaEyeSlash
@@ -95,7 +95,10 @@ const SignIn: React.FC = () => {
         </div>
       </div>
       <div className="md:w-1/2 hidden md:flex justify-center items-center min-h-screen h-full bg-sky-600 px-5 fixed right-0">
-        <img src="/SignInImage.jpg" className="rounded-lg w-[450px]"></img>
+        <img
+          src="/SignInImage.jpg"
+          className="rounded-lg w-[450px] aspect-square"
+        ></img>
       </div>
     </div>
   );
