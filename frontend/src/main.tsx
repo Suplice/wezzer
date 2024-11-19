@@ -5,11 +5,12 @@ import "./index.css";
 import App from "./App.tsx";
 import SignUp from "./Components/SignUp/SignUp.tsx";
 import SignIn from "./Components/SignIn/SignIn.tsx";
+import Home from "./Pages/Home/Home.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Home />,
   },
   {
     path: "/signup",
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <SignIn />,
+  },
+  {
+    path: "/Home",
+    element: <Home />,
   },
   {
     // TODO 404 page
