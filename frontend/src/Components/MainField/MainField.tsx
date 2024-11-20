@@ -15,7 +15,7 @@ const MainField: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col max-w-[1400px] mx-auto mt-5 h-full min-h-[calc(100vh-92px)] no-scroll ">
+    <div className="flex flex-col max-w-[1600px] mx-auto mt-5 h-full min-h-[calc(100vh-92px)] no-scroll ">
       <div className="flex flex-row justify-between px-6  ">
         <p className="font-semibold text-2xl">Browse Rooms</p>
         <button

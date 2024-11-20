@@ -18,17 +18,34 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
         className="bg-white rounded-lg p-6 w-11/12 sm:w-1/2 lg:w-1/3 shadow-lg relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold mb-4">Create Room</h2>
+        <div className="flex flex-row items-center justify-between">
+          <h2 className="text-xl font-bold mb-4">Create Room</h2>
+          <button
+            onClick={onClose}
+            className=" text-gray-400 hover:text-gray-600"
+          >
+            X
+          </button>
+        </div>
+
         <form>
           <div className="mb-4">
-            <label htmlFor="roomName" className="block text-sm font-medium">
-              Room Name
-            </label>
+            <label className=" text-sm font-medium">Room Name</label>
             <input
               type="text"
               id="roomName"
               className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div className="mb-4">
+            <label className=" text-sm font-medium">Room Name</label>
+            <textarea
+              className="border w-full  outline-none p-2 resize-none border-gray-300  focus:ring-blue-500 focus:ring-2 rounded"
+              cols={10}
+              rows={5}
+            >
+              dada
+            </textarea>
           </div>
           <div className="flex justify-end gap-2">
             <button
