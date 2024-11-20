@@ -81,7 +81,10 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
 
         <form>
           <div className="mb-4">
-            <label className="text-sm font-medium">Room Name</label>
+            <label className="text-sm font-medium flex flex-row items-center">
+              <p>Room Name</p>
+              <p className="ml-1 text-red-600 text-sm">*</p>
+            </label>
             <input
               type="text"
               id="roomName"
@@ -89,7 +92,10 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
             />
           </div>
           <div className="mb-4">
-            <label className="text-sm font-medium">Room Description</label>
+            <label className="text-sm font-medium flex flex-row items-center">
+              <p>Room Description</p>
+              <p className="ml-1 text-red-600 text-sm">*</p>
+            </label>
             <textarea
               className="border w-full outline-none p-2 resize-none border-gray-300 focus:ring-blue-500 focus:ring-2 rounded"
               cols={10}
