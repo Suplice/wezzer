@@ -22,10 +22,17 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
     document.addEventListener("drop", (e) => e.preventDefault());
   }, []);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (selectedImage) {
+      return;
+    }
+    e.stopPropagation();
+    fileInputRef.current?.click();
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.items[0];
-    console.log(file);
     if (file) {
       const isValid = file.type === "image/jpeg" || file.type === "image/jpg";
       setDragStatus(isValid ? "valid" : "invalid");
@@ -59,7 +66,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1, transition: { duration: 0.3 } }}
         exit={{ y: -50, opacity: 0, transition: { duration: 0.3 } }}
-        className="bg-white rounded-lg p-6 sm:w-1/2 lg:w-1/3 shadow-lg"
+        className="bg-white rounded-lg p-8 sm:w-1/2 lg:w-1/3 shadow-lg "
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between mb-4 items-center">
@@ -89,6 +96,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
               rows={3}
             ></textarea>
           </div>
+          <label className="text-sm font-medium mb-1">Background image</label>
           <div
             className={`flex items-center justify-center w-full h-[200px] flex-col mb-2 hover:cursor-pointer custom-dashed-border transition-all relative gap-4 ${
               dragStatus === "valid"
@@ -99,26 +107,46 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
             }`}
             ref={fileDivInputRef}
           >
-            <FaImages size={38} />
-            <label className="text-xl font-semibold">
-              Drag images here or select new files
-            </label>
-            <input
-              ref={fileInputRef}
-              type="image"
-              accept=".jpg, .jpeg"
-              className="w-full hidden"
-            />
+            {selectedImage !== "" ? (
+              <img
+                src={selectedFile ? URL.createObjectURL(selectedFile) : ""}
+                alt="room"
+                className="w-full h-full object-fill "
+              />
+            ) : (
+              <>
+                <FaImages size={38} />
+                <label className="text-xl font-semibold text-center">
+                  Drag images here or click to select new files
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jpg, .jpeg"
+                  className="w-full hidden"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      const file = e.target.files[0];
+                      console.log(file);
+                      setSelectedImage(file.name);
+                      setSelectedFile(file);
+                    }
+                  }}
+                />
+              </>
+            )}
+
             <div
               className="absolute w-full h-full"
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onDragEnter={handleDragOver}
+              onClick={handleClick}
             ></div>
           </div>
           <div className="flex flex-row items-center mb-2">
             <p className="text-lg font-semibold">Selected Image: </p>
-            <p className="text-lg ml-2"> {selectedImage}</p>
+            <p className="text-lg ml-2 truncate "> {selectedImage}</p>
             <CgPlayListRemove
               onClick={() => {
                 setSelectedImage("");
