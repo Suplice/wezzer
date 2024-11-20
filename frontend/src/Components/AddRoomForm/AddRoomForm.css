@@ -1,0 +1,5 @@
+.custom-dashed-border {
+  border-style: dashed;
+  border-width: 3px;
+  border-spacing: 10px;
+}
