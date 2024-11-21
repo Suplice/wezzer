@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface RoomCardProps {
   roomId: string;
@@ -17,9 +18,18 @@ const RoomCard: React.FC<RoomCardProps> = ({
   roomCreator,
   roomCreaterAvatar,
 }) => {
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/r/${roomId}`);
+  };
+
   return (
     <>
-      <div className="w-full bg-gray-200 rounded-xl hover:cursor-pointer ">
+      <div
+        onClick={handleNavigate}
+        className="w-full bg-gray-200 rounded-xl hover:cursor-pointer "
+      >
         <div className="relative bg-gray-400 rounded-xl shadow-lg ">
           <img
             src="/SignInImage.jpg"
