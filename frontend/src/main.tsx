@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import SignUp from "./Components/SignUp/SignUp.tsx";
 import SignIn from "./Components/SignIn/SignIn.tsx";
 import Home from "./Pages/Home/Home.tsx";
+import Room from "./Pages/Room/Room.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
     // TODO 404 page
     path: "*",
     element: <div>404</div>,
+  },
+  {
+    path: "/r/:roomId",
+    element: <Room />,
   },
 ]);
 
