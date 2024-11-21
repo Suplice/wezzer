@@ -1,5 +1,5 @@
 import React from "react";
-import RoomCard from "../Room/RoomCard";
+import RoomCard from "../RoomCard/RoomCard";
 
 const RoomManager: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"1"}
       />
       <RoomCard
         roomName={""}
@@ -18,7 +18,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"2"}
       />
       <RoomCard
         roomName={""}
@@ -26,7 +26,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"3"}
       />
       <RoomCard
         roomName={""}
@@ -34,7 +34,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"4"}
       />
       <RoomCard
         roomName={""}
@@ -42,7 +42,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"5"}
       />
       <RoomCard
         roomName={""}
@@ -50,7 +50,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"6"}
       />
       <RoomCard
         roomName={""}
@@ -58,7 +58,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"7"}
       />
       <RoomCard
         roomName={""}
@@ -66,7 +66,7 @@ const RoomManager: React.FC = () => {
         roomBackground={""}
         roomCreator={""}
         roomCreaterAvatar={""}
-        roomId={""}
+        roomId={"8"}
       />
     </div>
   );
