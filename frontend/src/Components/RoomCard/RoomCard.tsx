@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -26,7 +27,10 @@ const RoomCard: React.FC<RoomCardProps> = ({
 
   return (
     <>
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         onClick={handleNavigate}
         className="w-full bg-gray-200 rounded-xl hover:cursor-pointer "
       >
@@ -37,8 +41,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 backdrop-blur-md ">
             <p className="text-white text-xl font-semibold text-center">
-              This is the room for the best people in the world, come and play
-              with us
+              {roomDescription}
             </p>
           </div>
         </div>
@@ -57,7 +60,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
             title={roomCreator ?? ""}
           />
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };
