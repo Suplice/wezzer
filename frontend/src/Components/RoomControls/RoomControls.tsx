@@ -1,3 +1,4 @@
+import { motion } from "motion/react";
 import React, { useState } from "react";
 import { IoMdExit } from "react-icons/io";
 import { PiMicrophoneFill } from "react-icons/pi";
@@ -17,7 +18,12 @@ const RoomControls: React.FC = () => {
   };
 
   return (
-    <div className="absolute bottom-2 md:w-[500px] bg-white/20 backdrop-blur  h-[64px] rounded-2xl flex flex-row justify-between items-center md:px-10 px-6 w-[300px]  ">
+    <motion.div
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="absolute bottom-2 md:w-[500px] bg-white/20 backdrop-blur  h-[64px] rounded-2xl flex flex-row justify-between items-center md:px-10 px-6 w-[300px]  "
+    >
       <div className="flex flex-row gap-3">
         <div
           onClick={() => setIsMuted(!isMuted)}
@@ -51,13 +57,13 @@ const RoomControls: React.FC = () => {
       <div>
         <button
           onClick={handleLeave}
-          className=" gap-6 bg-red-500 px-4 py-2 rounded-md text-center font-bold  text-white flex flex-row  justify-between items-center"
+          className=" gap-6 bg-red-500 px-4 py-2 rounded-md text-center font-bold  text-white flex flex-row  justify-between items-center hover:bg-red-600 transition-all duration-300"
         >
           <p>Leave</p>
           <IoMdExit size={22} />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
