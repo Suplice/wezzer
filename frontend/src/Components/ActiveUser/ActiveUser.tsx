@@ -19,7 +19,6 @@ const ActiveUser: React.FC<ActiveUserInterface> = ({
         }`}
         src={profileImg}
       ></img>
-      <p>{name}</p>
     </div>
   );
 };
