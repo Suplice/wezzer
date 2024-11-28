@@ -55,7 +55,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </p>
           <img
             src={roomCreaterAvatar === "" ? "/basicAvatar.png" : "/Logo.jpg"}
-            className="rounded-full absolute right-5 bottom-11 shadow-[0px_0px_6px_1px_rgba(0,_0,_0,_0.45)] bg-white w-[48px] "
+            className="rounded-full absolute right-5 bottom-11 shadow-[0px_0px_6px_1px_rgba(0,_0,_0,_0.45)] bg-white w-[48px] hover:scale-110 transition-all "
             alt="Logo"
             title={roomCreator ?? ""}
           />
