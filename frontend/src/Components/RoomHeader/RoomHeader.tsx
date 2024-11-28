@@ -7,8 +7,11 @@ interface RoomHeaderInterface {
 
 const RoomHeader: React.FC<RoomHeaderInterface> = ({ roomName }) => {
   return (
-    <div className="w-full bg-gray-900 h-[80px] flex flex-row  items-center justify-between xl:px-48 lg:px-32 md:px-16 sm:px-8 px-4  ">
-      <div className="text-white w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center hover:cursor-pointer hover:bg-slate-100 tansition-all duration-150">
+    <div className=" bg-gray-900 h-[80px] flex flex-row  items-center justify-between xl:px-48 lg:px-32 md:px-16 sm:px-8 px-4  ">
+      <div
+        onClick={() => window.history.back()}
+        className="text-white w-[40px] h-[40px] rounded-full bg-white flex items-center justify-center hover:cursor-pointer hover:bg-slate-100 tansition-all duration-150"
+      >
         <FaArrowLeft color="black" />
       </div>
       <div className="text-white font-bold text-lg">{roomName}</div>
