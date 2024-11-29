@@ -8,12 +8,16 @@ import { FaEyeSlash } from "react-icons/fa6";
 import { motion } from "motion/react";
 import { useAuth } from "../../Context/AuthContext";
 import { ApiResponse, RegisterData } from "../../utils/models";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SignUp: React.FC = () => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+
+  const navigate = useNavigate();
 
   const { registerWithEmailAndPassword } = useAuth();
 
@@ -44,12 +48,19 @@ const SignUp: React.FC = () => {
 
   const signUpValidation = async (data: RegisterData) => {
     setButtonDisabled(true);
-    const result: ApiResponse = await registerWithEmailAndPassword({
+    const response: ApiResponse = await registerWithEmailAndPassword({
       name: data.name,
       email: data.email,
       password: data.password,
     });
     setButtonDisabled(false);
+
+    if (response.result) {
+      toast.success(response.message);
+      navigate("/");
+    } else {
+      toast.error(response.message);
+    }
   };
 
   return (
