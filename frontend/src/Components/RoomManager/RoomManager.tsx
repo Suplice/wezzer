@@ -10,7 +10,10 @@ const RoomManager: React.FC = () => {
   useEffect(() => {
     const getRooms = async () => {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/api/rooms", {});
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/rooms`,
+        {}
+      );
 
       if (response.ok) {
         const data = await response.json();
