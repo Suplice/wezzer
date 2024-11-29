@@ -1,14 +1,56 @@
 import React, { useState } from "react";
 import SocialAuthButtons from "../SocialAuthButtons/SocialAuthButtons";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa6";
 import { motion } from "motion/react";
+import { useAuth } from "../../Context/AuthContext";
+import { ApiResponse, RegisterData } from "../../utils/models";
 
 const SignUp: React.FC = () => {
-  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+
+  const { registerWithEmailAndPassword } = useAuth();
+
+  const schema = yup.object().shape({
+    name: yup.string().required("Name is required"),
+    email: yup.string().email().required("Email is required"),
+    password: yup
+      .string()
+      .min(8)
+      .required("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[A-Za-z\d\W]{8,}$/,
+        "Password must contain at least one capital letter, one number and one special character"
+      ),
+    confirmPassword: yup
+      .string()
+      .required("Confirm password is required")
+      .oneOf([yup.ref("password")], "Passwords must match"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const signUpValidation = async (data: RegisterData) => {
+    setButtonDisabled(true);
+    const result: ApiResponse = await registerWithEmailAndPassword({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
+    setButtonDisabled(false);
+  };
 
   return (
     <div className="flex flex-row w-full h-screen ">
@@ -29,28 +71,55 @@ const SignUp: React.FC = () => {
         >
           <h1 className="font-bold text-3xl pb-6">Sign Up</h1>
 
-          <form className="flex flex-col gap-1 ">
+          <form
+            autoComplete="off"
+            className="flex flex-col gap-1 "
+            onSubmit={handleSubmit(signUpValidation)}
+          >
             <label className="flex items-center text-xl font-semibold">
               Name <p className="text-red-700 ml-1"> *</p>
             </label>
             <input
               type="text"
-              className="border h-12 rounded-sm pl-4 outline-none text-xl focus:border-cyan-600 transition-all duration-150"
+              className={`border h-12 rounded-sm pl-4 outline-none text-xl focus:border-cyan-600 transition-all duration-150 ${
+                errors.name ? "border-red-500 focus:border-red-300" : ""
+              }`}
+              {...register("name")}
             ></input>
+            {errors.name && (
+              <span className="text-red-500 text-sm font-semibold">
+                {errors.name?.message}
+              </span>
+            )}
             <label className="flex items-center text-xl font-semibold mt-2">
               Email <p className="text-red-700 ml-1"> *</p>
             </label>
             <input
               type="email"
-              className="border h-12 rounded-sm outline-none pl-4 text-xl focus:border-cyan-600 transition-all duration-150"
+              className={`border h-12 rounded-sm outline-none pl-4 text-xl focus:border-cyan-600 transition-all duration-150 ${
+                errors.email ? "border-red-500 focus:border-red-300" : ""
+              }`}
+              {...register("email")}
             ></input>
+            {errors.email && (
+              <span className="text-red-500 text-sm font-semibold">
+                {errors.email?.message}
+              </span>
+            )}
             <label className="flex items-center text-xl font-semibold mt-2">
               Password <p className="text-red-700 ml-1"> *</p>
             </label>
-            <div className="border h-12 rounded-sm outline-none pl-4  focus-within:border-cyan-600 transition-all duration-150 flex items-center ">
+            <div
+              className={`border h-12 rounded-sm outline-none pl-4  focus-within:border-cyan-600 transition-all duration-150 flex items-center ${
+                errors.password
+                  ? "border-red-500 focus-within:border-red-300"
+                  : ""
+              } `}
+            >
               <input
                 type={isPasswordVisible ? "text" : "password"}
                 className="   outline-none  text-xl w-full focus:border-cyan-600 transition-all duration-150"
+                {...register("password")}
               ></input>
               {isPasswordVisible ? (
                 <FaEyeSlash
@@ -66,13 +135,25 @@ const SignUp: React.FC = () => {
                 />
               )}
             </div>
+            {errors.password && (
+              <span className="text-red-500 text-sm font-semibold">
+                {errors.password?.message}
+              </span>
+            )}
             <label className="flex items-center text-xl font-semibold mt-2">
               Confirm Password <p className="text-red-700 ml-1"> *</p>
             </label>
-            <div className="border h-12 rounded-sm outline-none pl-4  focus-within:border-cyan-600 transition-all duration-150 flex items-center">
+            <div
+              className={`border h-12 rounded-sm outline-none pl-4  focus-within:border-cyan-600 transition-all duration-150 flex items-center ${
+                errors.confirmPassword
+                  ? "border-red-500 focus-within:border-red-300"
+                  : ""
+              }`}
+            >
               <input
                 type={isConfirmPasswordVisible ? "text" : "password"}
                 className="   outline-none  text-xl w-full focus:border-cyan-600 transition-all duration-150"
+                {...register("confirmPassword")}
               ></input>
               {isConfirmPasswordVisible ? (
                 <FaEyeSlash
@@ -92,7 +173,13 @@ const SignUp: React.FC = () => {
                 />
               )}
             </div>
+            {errors.confirmPassword && (
+              <span className="text-red-500 text-sm font-semibold">
+                {errors.confirmPassword?.message}
+              </span>
+            )}
             <button
+              type="submit"
               disabled={buttonDisabled}
               className={`mt-6 border h-12 rounded-md bg-cyan-500 hover:bg-cyan-600 transition-all duration-150 text-xl font-semibold ${
                 buttonDisabled ? "bg-gray-400 hover:bg-gray-500" : ""
