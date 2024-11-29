@@ -6,6 +6,7 @@ import {
   useEffect,
 } from "react";
 import { ApiResponse, LoginData, RegisterData, User } from "../utils/models";
+import Loading from "../Pages/Loading/Loading";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,8 +20,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
 
   const login = () => {
@@ -131,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(
           `${import.meta.env.VITE_DJANGO_URL}/api/checkCredentials`,
           {
@@ -160,13 +162,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error(error);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
-
     checkAuth();
-
-    console.log(isAuthenticated);
-    setIsLoading(false);
   }, []);
 
   return (
@@ -180,7 +180,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
       }}
     >
-      {isLoading ? <div>Loading...</div> : children}
+      {isLoading ? <Loading /> : children}
     </AuthContext.Provider>
   );
 };
