@@ -50,20 +50,21 @@ const SignIn: React.FC = () => {
     setButtonDisabled(false);
   };
 
+  const navigateToMainPage = () => {
+    navigate("/");
+  };
+
   return (
     <div className="flex flex-row w-full h-screen ">
       <div className="md:w-1/2 w-full h-full md:p-4 p-6 xl:px-32 lg:px-12 flex justify-between flex-col ">
-        <NavLink to="/">
-          <img
-            src="/Logo.jpg"
-            alt="logo"
-            width="60px"
-            className="rounded-xl flex-shrink-0 hover:cursor-pointer"
-            onClick={() => {
-              window.location.href = "/";
-            }}
-          ></img>
-        </NavLink>
+        <img
+          src="/Logo.jpg"
+          alt="logo"
+          width="60px"
+          className="rounded-xl flex-shrink-0 hover:cursor-pointer"
+          onClick={navigateToMainPage}
+        ></img>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.5 } }}
