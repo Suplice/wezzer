@@ -5,19 +5,21 @@ import {
   useContext,
   useEffect,
 } from "react";
-import { ApiResponse, RegisterData, User } from "../utils/models";
+import { ApiResponse, LoginData, RegisterData, User } from "../utils/models";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   login: () => void;
   logout: () => void;
   registerWithEmailAndPassword: (data: RegisterData) => Promise<ApiResponse>;
+  signInWithEmailAndPassword: (data: LoginData) => Promise<ApiResponse>;
   user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
@@ -71,12 +73,100 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const signInWithEmailAndPassword = async (data: LoginData) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+          credentials: "include",
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setUser({
+          name: responseData.user.Nickname,
+          email: data.email,
+          id: responseData.user.UserId,
+        });
+
+        console.log({
+          name: responseData.user.Nickname,
+          email: data.email,
+          id: responseData.user.UserId,
+        });
+        setIsAuthenticated(true);
+
+        return {
+          message: responseData.message,
+          result: true,
+          data: responseData,
+        } as ApiResponse;
+      } else {
+        console.error(responseData);
+        return {
+          message: responseData.error,
+          result: false,
+        } as ApiResponse;
+      }
+    } catch (error) {
+      console.error(error);
+      return {
+        message: "An error occurred, please try again later",
+        result: false,
+      } as ApiResponse;
+    }
+  };
+
   const logout = () => {
     setIsAuthenticated(false);
   };
 
   useEffect(() => {
-    const checkAuth = async () => {};
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_DJANGO_URL}/api/checkCredentials`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        const responseData = await response.json();
+
+        console.log(responseData);
+
+        if (response.ok) {
+          setUser({
+            name: responseData.user.Nickname,
+            email: responseData.user.Email,
+            id: responseData.user.UserId,
+          });
+
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+
+    console.log(isAuthenticated);
+    setIsLoading(false);
   }, []);
 
   return (
@@ -86,10 +176,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         registerWithEmailAndPassword,
+        signInWithEmailAndPassword,
         user,
       }}
     >
-      {children}
+      {isLoading ? <div>Loading...</div> : children}
     </AuthContext.Provider>
   );
 };

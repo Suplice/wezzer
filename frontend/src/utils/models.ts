@@ -24,3 +24,8 @@ export type ApiResponse = {
   code?: number;
   data?: any;
 };
+
+export type LoginData = {
+  email: string;
+  password: string;
+};
