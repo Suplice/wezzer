@@ -186,3 +186,4 @@ def logout_user(request):
     response = JsonResponse({"success": True, "message": "Logged out successfully"})
     response.delete_cookie("authToken")
     return response
+
