@@ -11,7 +11,7 @@ import Loading from "../Pages/Loading/Loading";
 interface AuthContextType {
   isAuthenticated: boolean;
   login: () => void;
-  logout: () => void;
+  logout: () => Promise<ApiResponse>;
   registerWithEmailAndPassword: (data: RegisterData) => Promise<ApiResponse>;
   signInWithEmailAndPassword: (data: LoginData) => Promise<ApiResponse>;
   user: User | null;
@@ -125,8 +125,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     setIsAuthenticated(false);
+    setUser(null);
+
+    setIsLoading(true);
+
+    console.log("i am here");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        return {
+          message: "Logged out successfully",
+          result: true,
+        } as ApiResponse;
+      }
+    } catch (error) {
+      return {
+        message: "An error occurred, please try again later",
+        result: false,
+      } as ApiResponse;
+    } finally {
+      setIsLoading(false);
+    }
+    return {
+      message: "An error occurred, please try again later",
+      result: false,
+    } as ApiResponse;
   };
 
   useEffect(() => {
@@ -146,8 +182,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const responseData = await response.json();
 
-        console.log(responseData);
-
         if (response.ok) {
           setUser({
             name: responseData.user.Nickname,
@@ -160,7 +194,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error(error);
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);

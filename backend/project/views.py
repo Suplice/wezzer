@@ -181,3 +181,8 @@ def check_credentials(request):
         response = JsonResponse({"error": str(e)}, status=500)
         return response
 
+@csrf_exempt
+def logout_user(request):
+    response = JsonResponse({"success": True, "message": "Logged out successfully"})
+    response.delete_cookie("authToken")
+    return response

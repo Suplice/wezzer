@@ -1,9 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../Context/AuthContext";
 import { Avatar } from "@mantine/core";
+import { AnimatePresence, motion } from "motion/react";
+import { FaPowerOff } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+
+  const naviagte = useNavigate();
+
+  const handleLogout = async () => {
+    const response = await logout();
+    if (response.result) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
+    }
+    naviagte("/login");
+  };
+
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      const menu = document.getElementById("menu");
+      const avatar = document.getElementById("avatar");
+      if (
+        menu &&
+        !menu.contains(e.target as Node) &&
+        avatar &&
+        !avatar.contains(e.target as Node)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, []);
 
   return (
     <div className="bg-sky-600 h-[72px] w-full md:px-8 px-4 sticky z-10 m-0 top-0">
@@ -20,15 +58,57 @@ const Navbar: React.FC = () => {
           ></img>
           <p className="font-bold text-white text-2xl">Wezzer</p>
         </div>
-        <div className="flex">
+        <div className="flex relative">
           {isAuthenticated ? (
-            <Avatar
-              variant="filled"
-              radius="xl"
-              size={45}
-              color="violet"
-              name={user?.name}
-            ></Avatar>
+            <>
+              <Avatar
+                variant="filled"
+                radius="xl"
+                size={45}
+                color="violet"
+                name={user?.name}
+                className="hover:cursor-pointer"
+                onClick={() => {
+                  setMenuOpen((prev) => !prev);
+                }}
+                id="avatar"
+              ></Avatar>
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{
+                      y: 0,
+                      opacity: 1,
+                      transition: { duration: 0.3 },
+                    }}
+                    exit={{
+                      y: -20,
+                      opacity: 0,
+                      transition: { duration: 0.3 },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className={`absolute w-[180px] flex flex-col gap-2 bg-white z-10  rounded-md shadow-lg top-12 right-0 mx-auto p-2 `}
+                    id="menu"
+                  >
+                    <p className="text-sm text-center">Hello, {user?.name}</p>
+                    <div>
+                      <button className="text-red-500 rounded-md p-1 text-left flex flex-row gap-3 items-center hover:bg-red-100/50 w-full pr-6 pl-2">
+                        <FaPowerOff />
+                        <p
+                          className="text-md font-semibold"
+                          onClick={handleLogout}
+                        >
+                          Logout
+                        </p>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           ) : (
             <a
               href="/login"
