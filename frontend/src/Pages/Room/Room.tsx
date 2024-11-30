@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import RoomBody from "../../Components/RoomBody/RoomBody";
 import RoomHeader from "../../Components/RoomHeader/RoomHeader";
+import { useAuth } from "../../Context/AuthContext";
 
 const Room: React.FC = () => {
-  const { roomId } = useParams<{ roomId: string }>();
-  const [roomName, setRoomName] = useState<string>("Test Room Name");
+  const { roomName } = useParams<{
+    roomName: string;
+  }>();
+
   return (
     <div className="h-screen">
-      <RoomHeader roomName={roomName} />
+      <RoomHeader roomName={"test"} />
       <RoomBody />
     </div>
   );
