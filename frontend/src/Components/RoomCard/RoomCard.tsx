@@ -9,6 +9,7 @@ interface RoomCardProps {
   roomBackground: string;
   roomCreator: string;
   roomCreaterAvatar: string;
+  onClick: (roomId: string) => void;
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -18,21 +19,16 @@ const RoomCard: React.FC<RoomCardProps> = ({
   roomBackground,
   roomCreator,
   roomCreaterAvatar,
+  onClick,
 }) => {
-  const navigate = useNavigate();
-
-  const handleNavigate = () => {
-    navigate(`/r/${roomId}`);
-  };
-
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        onClick={handleNavigate}
         className="w-full bg-gray-200 rounded-xl hover:cursor-pointer "
+        onClick={() => onClick(roomId)}
       >
         <div className="relative bg-gray-400 rounded-xl shadow-lg ">
           <img
