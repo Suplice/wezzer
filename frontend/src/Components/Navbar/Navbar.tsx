@@ -94,15 +94,10 @@ const Navbar: React.FC = () => {
                     id="menu"
                   >
                     <p className="text-sm text-center">Hello, {user?.name}</p>
-                    <div>
+                    <div onClick={handleLogout}>
                       <button className="text-red-500 rounded-md p-1 text-left flex flex-row gap-3 items-center hover:bg-red-100/50 w-full pr-6 pl-2">
                         <FaPowerOff />
-                        <p
-                          className="text-md font-semibold"
-                          onClick={handleLogout}
-                        >
-                          Logout
-                        </p>
+                        <p className="text-md font-semibold">Logout</p>
                       </button>
                     </div>
                   </motion.div>
