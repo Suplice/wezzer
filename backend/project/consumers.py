@@ -51,26 +51,45 @@ class RoomConsumer(AsyncWebsocketConsumer):
         # Initially set user to None
         self.user = None
 
+        await self.channel_layer.group_add(
+        self.room_group_name,
+        self.channel_name
+    )
+
         # Add user info from first message (authentication)
         await self.accept()  # Accept the connection first
 
     async def receive(self, text_data):
         data = json.loads(text_data)
 
-        # Handle the first message with user information
         if not self.user:
             if data.get("type") == "authenticate":
-                # Set user data from the message
                 self.user = {
                     "id": data["userId"],
                     "nickname": data["userName"]
                 }
 
+                # Update user's room
                 await update_user_room(self.user['id'], self.room_id)
 
+                # Get the updated list of participants
                 result = await get_room_participants(self.room_id)
 
-                await self.send(json.dumps({"type": "authenticated", "message": "User authenticated successfully", "data" : result}))
+                # Broadcast the updated list to all users in the room
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        "type": "user_joined",
+                        "data": result,
+                    }
+                )
+
+                # Send the participants list to the newly connected user
+                await self.send(json.dumps({
+                    "type": "authenticated",
+                    "message": "User authenticated successfully",
+                    "data": result
+                }))
                 return
             else:
                 await self.send(json.dumps({"error": "Authentication failed"}))
@@ -102,13 +121,16 @@ class RoomConsumer(AsyncWebsocketConsumer):
                 print(f"Error removing user from room: {e}")
 
             # Notify others that the user has left
+            result = await get_room_participants(self.room_id)
+
+                # Broadcast the updated list to all users in the room
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {
-                    "type": "user_left",
-                    "user": {"id": self.user['id'], "nickname": self.user['nickname']},
-                }
-            )
+                    {
+                        "type": "user_left",
+                        "data": result,
+                    }
+                )
 
             # Discard the user from the group
             await self.channel_layer.group_discard(
@@ -127,13 +149,14 @@ class RoomConsumer(AsyncWebsocketConsumer):
             )
 
     async def user_joined(self, event):
+            
         await self.send(json.dumps({
             "type": "user_joined",
-            "user": event['user'],
+            "data": event['data'],
         }))
 
     async def user_left(self, event):
         await self.send(json.dumps({
             "type": "user_left",
-            "user": event['user'],
+            "data": event['data'],
         }))

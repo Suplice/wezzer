@@ -1,12 +1,14 @@
 import datetime
 import json
 import os
+import uuid
 import bcrypt
 import jwt
 from supabase import create_client, Client
-from django.http import JsonResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from dotenv import load_dotenv
 from django.views.decorators.csrf import csrf_exempt
+
 
 load_dotenv()
 
@@ -186,4 +188,93 @@ def logout_user(request):
     response = JsonResponse({"success": True, "message": "Logged out successfully"})
     response.delete_cookie("authToken")
     return response
+
+
+@csrf_exempt
+def create_room(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+    try:
+        token = request.COOKIES.get("authToken")
+        if not token:
+            return JsonResponse({"error": "No token provided"}, status=401)
+        
+        payload = jwt.decode(token, os.getenv("DJANGO_SECRET_KEY"), algorithms=["HS256"])
+
+        is_valid = payload.get("exp") > datetime.datetime.now().timestamp()
+
+        if not is_valid:
+            response = JsonResponse({"error": "Token has expired"}, status=401)
+            response.delete_cookie("authToken")
+            return response
+
+        userId = payload.get("sub")
+
+        roomId = uuid.uuid4()
+
+        supabase = get_supabase_client()
+
+        user = supabase.table("project_users").select("*").eq("UserId", userId).execute().data[0]
+
+        if not user:
+            return JsonResponse({"error": "User not found"}, status=404)
+        
+        name = request.POST.get("roomName")
+        description = request.POST.get("roomDescription")
+        fileName = request.POST.get("roomBackground")
+
+        if not name or not description:
+            return JsonResponse({"error": "Missing required fields"}, status=400)
+        
+        response = supabase.table("project_rooms").insert([
+            {"RoomId": str(roomId), "Name": name, "Description": description,"backgroundImage": fileName, "CreatorId": userId}
+        ]).execute()
+
+        file = request.FILES.get("file")
+
+        if file:
+            file_path = os.path.join(f"media/{fileName}")
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            try:
+                with open(file_path, "wb") as f:
+                    for chunk in file.chunks():
+                        f.write(chunk)
+            except Exception as e:
+                return JsonResponse({"error": f"Failed to save file: {str(e)}"}, status=500)
+        
+
+           
+
+        return JsonResponse(response.data, safe=False)
+    except jwt.ExpiredSignatureError:
+        response = JsonResponse({"error": "Token has expired"}, status=401)
+        response.delete_cookie("authToken")
+        return response
+    except jwt.InvalidTokenError:
+        response = JsonResponse({"error": "Invalid token"}, status=401)
+        response.delete_cookie("authToken")
+        return response
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+def get_background_image(request, file_name):
+    file_path = os.path.join(f"media/{file_name}")
+    try:
+        return FileResponse(open(file_path, "rb"), content_type="image/jpeg")
+    except FileNotFoundError:
+        return HttpResponse("File not found", status=404)
+    
+def get_background_image_with_room_id(request, room_id):
+    supabase = get_supabase_client()
+    response = supabase.table("project_rooms").select("backgroundImage").eq("RoomId", room_id).execute()
+    file_name = response.data[0]["backgroundImage"]
+    file_path = os.path.join(f"media/{file_name}")
+    try:
+        return FileResponse(open(file_path, "rb"), content_type="image/jpeg")
+    except FileNotFoundError:
+        return HttpResponse("File not found", status=404)
 

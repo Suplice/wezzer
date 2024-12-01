@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from project.views import check_credentials, get_rooms, login_user, logout_user, register_user
+from project.views import check_credentials, create_room, get_background_image, get_background_image_with_room_id, get_rooms, login_user, logout_user, register_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,7 @@ urlpatterns = [
     path('api/login', login_user, name='login'),
     path('api/checkCredentials', check_credentials, name='check_credentials'),
     path('api/logout', logout_user, name='logout'),
+    path('api/createRoom', create_room, name='create_room'),
+    path('api/getBackgroundImage/<str:file_name>', get_background_image, name='get_background_image'),
+    path('api/getBackgroundImageWithId/<str:room_id>', get_background_image_with_room_id, name='get_background_image_with_id'),
 ]
