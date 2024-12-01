@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface RoomCardProps {
@@ -21,6 +21,29 @@ const RoomCard: React.FC<RoomCardProps> = ({
   roomCreaterAvatar,
   onClick,
 }) => {
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_DJANGO_URL
+          }/api/getBackgroundImage/${roomBackground}`
+        );
+
+        if (!response.ok) throw new Error("Image not found");
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
+    fetchImage();
+  }, [roomBackground]);
+
   return (
     <>
       <motion.div
@@ -32,7 +55,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
       >
         <div className="relative bg-gray-400 rounded-xl shadow-lg ">
           <img
-            src="/SignInImage.jpg"
+            src={imageSrc !== null ? imageSrc : "/public/Logo.jpg"}
             className="aspect-video w-full rounded-xl"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 backdrop-blur-md ">
