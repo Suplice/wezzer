@@ -3,6 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { FaImages } from "react-icons/fa";
 import { CgPlayListRemove } from "react-icons/cg";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface AddRoomFormProps {
   onClose: () => void;
@@ -16,11 +21,63 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   );
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
-  useEffect(() => {
-    document.addEventListener("dragover", (e) => e.preventDefault());
-    document.addEventListener("drop", (e) => e.preventDefault());
-  }, []);
+  const navigate = useNavigate();
+
+  const schema = yup.object().shape({
+    roomName: yup.string().required("Room Name is required"),
+    roomDescription: yup.string().required("Room Description is required"),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const AddRoomValidation = async (data: any) => {
+    setButtonDisabled(true);
+
+    const fileName = selectedFile ? selectedFile.name : "Logo.jpg";
+
+    const formData = new FormData();
+
+    formData.append("file", selectedFile as Blob);
+
+    formData.append("roomName", data.roomName);
+    formData.append("roomDescription", data.roomDescription);
+    formData.append("roomBackground", fileName);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/createRoom`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success("Room created successfully");
+
+        console.log(result);
+        navigate(`/r/${result[0].RoomId}/${result[0].Name}`);
+      } else {
+        toast.error("Failed to create room, please try again");
+        console.error(result);
+      }
+
+      setButtonDisabled(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleClick = (e: React.MouseEvent) => {
     if (selectedImage) {
@@ -57,17 +114,22 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
     }
   };
 
+  useEffect(() => {
+    document.addEventListener("dragover", (e) => e.preventDefault());
+    document.addEventListener("drop", (e) => e.preventDefault());
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-20 flex items-center justify-center bg-gray-800 bg-opacity-75 backdrop-blur-md w-full h-full px-2 md:px-0"
-      onClick={onClose}
+      onMouseDown={onClose}
     >
       <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1, transition: { duration: 0.3 } }}
         exit={{ y: -50, opacity: 0, transition: { duration: 0.3 } }}
         className="bg-white rounded-lg p-8 sm:w-1/2 lg:w-1/3 shadow-lg "
-        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex flex-row justify-between mb-4 items-center">
           <h2 className="text-xl font-bold text-center">Create Room</h2>
@@ -79,16 +141,21 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <form>
+        <form autoComplete="off" onSubmit={handleSubmit(AddRoomValidation)}>
           <div className="mb-4">
             <label className="text-sm font-medium flex flex-row items-center">
               <p>Room Name</p>
               <p className="ml-1 text-red-600 text-sm">*</p>
             </label>
             <input
+              {...register("roomName")}
               type="text"
               id="roomName"
-              className="w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full border border-gray-300 rounded px-3 py-2 mt-1 focus:outline-none   ${
+                errors.roomName
+                  ? "border-red-500 focus:border-red-300"
+                  : "focus:ring-2"
+              }`}
             />
           </div>
           <div className="mb-4">
@@ -97,7 +164,12 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
               <p className="ml-1 text-red-600 text-sm">*</p>
             </label>
             <textarea
-              className="border w-full outline-none p-2 resize-none border-gray-300 focus:ring-blue-500 focus:ring-2 rounded"
+              {...register("roomDescription")}
+              className={`border w-full outline-none p-2 resize-none border-gray-300   rounded ${
+                errors.roomDescription
+                  ? "border-red-500 focus:border-red-300"
+                  : "focus:ring-2"
+              }`}
               cols={10}
               rows={3}
             ></textarea>
