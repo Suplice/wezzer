@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import ActiveMembersSection from "../ActiveMembersSection/ActiveMembersSection";
 import RoomControls from "../RoomControls/RoomControls";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { Participant } from "../../utils/models";
+import _ from "lodash";
+import { toast } from "react-toastify";
 
 const RoomBody: React.FC = () => {
   const { roomId } = useParams<{
@@ -12,6 +14,8 @@ const RoomBody: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
   const { user } = useAuth();
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -19,9 +23,35 @@ const RoomBody: React.FC = () => {
   const localStreamRef = useRef<MediaStream | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    setIsLoading(true);
+
+    const checkIdentity = () => {
+      if (!user?.id) {
+        navigate("/");
+      }
+    };
+
+    const getRoomImage = async () => {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_DJANGO_URL
+          }/api/getBackgroundImageWithId/${roomId}`
+        );
+
+        if (!response.ok) throw new Error("Image not found");
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } catch (error) {
+        console.error("Error fetching image:", error);
+      }
+    };
+
     const initWebSocket = () => {
-      setIsLoading(true);
       socketRef.current = new WebSocket(
         `${import.meta.env.VITE_DJANGO_URL}/ws/room/${roomId}/`
       );
@@ -37,6 +67,19 @@ const RoomBody: React.FC = () => {
         };
 
         socketRef.current?.send(JSON.stringify(userInfoMessage));
+      };
+
+      socketRef.current.onerror = (error) => {
+        toast.error("An error occured, please try connecting again", {
+          autoClose: 2000,
+        });
+        setIsLoading(false);
+        navigate("/");
+      };
+
+      socketRef.current.onclose = () => {
+        toast.info("Disconnected from room", { autoClose: 2000 });
+        navigate("/");
       };
 
       socketRef.current.onmessage = async (e) => {
@@ -67,8 +110,18 @@ const RoomBody: React.FC = () => {
             );
           }
         } else if (data.type === "authenticated") {
+          console.log(
+            "Authenticated and received participants list:",
+            data.data
+          );
           setParticipants(data.data);
           setIsLoading(false);
+        } else if (data.type === "user_joined") {
+          console.log("Participants list updated:", data.data);
+          setParticipants(data.data);
+        } else if (data.type === "user_left") {
+          console.log("Participants list updated:", data.data);
+          setParticipants(data.data);
         }
       };
     };
@@ -101,7 +154,6 @@ const RoomBody: React.FC = () => {
       };
 
       peerConnection.ontrack = (event) => {
-        // Add remote tracks to audio playback
         const remoteAudio = document.createElement("audio");
         remoteAudio.srcObject = event.streams[0];
         remoteAudio.autoplay = true;
@@ -121,7 +173,8 @@ const RoomBody: React.FC = () => {
         })
       );
     };
-
+    checkIdentity();
+    getRoomImage();
     initWebSocket();
     getLocalStream();
 
@@ -135,7 +188,7 @@ const RoomBody: React.FC = () => {
     <div className="flex flex-col h-[calc(100%-80px)]  items-center justify-center  relative   ">
       <img
         className="absolute w-full h-full -z-10  "
-        src="/public/Logo.jpg"
+        src={`${imageSrc ? imageSrc : "/public/Logo.jpg"}`}
       ></img>
       <ActiveMembersSection users={participants} isLoading={isLoading} />
       <RoomControls />
