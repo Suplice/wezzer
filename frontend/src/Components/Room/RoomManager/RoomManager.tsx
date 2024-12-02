@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import RoomCard from "../RoomCard/RoomCard";
-import { Room } from "../../utils/models";
+import { Room } from "../../../utils/models";
 import RoomsLoading from "../RoomsLoading/RoomsLoading";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../Context/AuthContext";
+import { useAuth } from "../../../Context/AuthContext";
 import { toast } from "react-toastify";
 
 const RoomManager: React.FC = () => {

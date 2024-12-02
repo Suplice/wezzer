@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import RoomBody from "../../Components/RoomBody/RoomBody";
-import RoomHeader from "../../Components/RoomHeader/RoomHeader";
+import RoomBody from "../../Components/Room/RoomBody/RoomBody";
+import RoomHeader from "../../Components/Room/RoomHeader/RoomHeader";
 import { useAuth } from "../../Context/AuthContext";
 
 const Room: React.FC = () => {

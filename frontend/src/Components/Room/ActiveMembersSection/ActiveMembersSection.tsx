@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ActiveUser from "../ActiveUser/ActiveUser";
+import ActiveUser from "../../ActiveUser/ActiveUser";
 import { BlinkBlur } from "react-loading-indicators";
-import { Participant } from "../../utils/models";
+import { Participant } from "../../../utils/models";
 
 interface ActiveMembersSectionProps {
   users: Participant[];

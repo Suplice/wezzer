@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import SocialAuthButtons from "../SocialAuthButtons/SocialAuthButtons";
+import SocialAuthButtons from "../../SocialAuthButtons/SocialAuthButtons";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa6";
 import { motion } from "motion/react";
-import { useAuth } from "../../Context/AuthContext";
-import { ApiResponse, RegisterData } from "../../utils/models";
+import { useAuth } from "../../../Context/AuthContext";
+import { ApiResponse, RegisterData } from "../../../utils/models";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 

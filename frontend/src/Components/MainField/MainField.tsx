@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import RoomManager from "../RoomManager/RoomManager";
+import RoomManager from "../Room/RoomManager/RoomManager";
 import AddRoomForm from "../AddRoomForm/AddRoomForm";
 import { AnimatePresence } from "motion/react";
 import "../../index.css";

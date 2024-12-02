@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import ActiveMembersSection from "../ActiveMembersSection/ActiveMembersSection";
 import RoomControls from "../RoomControls/RoomControls";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../Context/AuthContext";
-import { Participant } from "../../utils/models";
+import { useAuth } from "../../../Context/AuthContext";
+import { Participant } from "../../../utils/models";
 import _ from "lodash";
 import { toast } from "react-toastify";
 
