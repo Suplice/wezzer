@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
+import { Tooltip, Button, Avatar } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 
 interface RoomCardProps {
@@ -39,10 +40,12 @@ const RoomCard: React.FC<RoomCardProps> = ({
       } catch (error) {
         console.error("Error fetching image:", error);
       }
+
+      console.log("i finished fetching image");
     };
 
     fetchImage();
-  }, [roomBackground]);
+  }, []);
 
   return (
     <>
@@ -65,19 +68,22 @@ const RoomCard: React.FC<RoomCardProps> = ({
           </div>
         </div>
 
-        <div className="flex flex-row justify-between px-3 py-5 items-center relative">
+        <div className="flex flex-row justify-between px-3 py-1 items-center relative">
           <p
             className="text-xl font-semibold truncate mr-10"
             title={roomName ?? ""}
           >
-            Test Name
+            {roomName}
           </p>
-          <img
-            src={roomCreaterAvatar === "" ? "/basicAvatar.png" : "/Logo.jpg"}
-            className="rounded-full absolute right-5 bottom-11 shadow-[0px_0px_6px_1px_rgba(0,_0,_0,_0.45)] bg-white w-[48px] hover:scale-110 transition-all "
-            alt="Logo"
-            title={roomCreator ?? ""}
-          />
+          <Tooltip label={roomCreator} withArrow position="bottom">
+            <Avatar
+              variant="filled"
+              color="violet"
+              name={roomCreator}
+              size={60}
+              className="absolute right-3 bottom-9 shadow-[0px_0px_6px_1px_rgba(0,_0,_0,_0.45)] transition-all "
+            ></Avatar>
+          </Tooltip>
         </div>
       </motion.div>
     </>

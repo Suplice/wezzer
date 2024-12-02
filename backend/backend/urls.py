@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from project.views import check_credentials, create_room, get_background_image, get_background_image_with_room_id, get_rooms, login_user, logout_user, register_user
+from project.views import check_credentials, create_room, get_background_image, get_background_image_with_room_id, get_creator_name, get_rooms, get_rooms_with_creator, login_user, logout_user, register_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/rooms', get_rooms, name='get_rooms'),
+    path('api/getRoomsWithCreator', get_rooms_with_creator, name='get_rooms_with_creator'),
     path('api/register', register_user, name='register_user'),
     path('api/login', login_user, name='login'),
     path('api/checkCredentials', check_credentials, name='check_credentials'),
@@ -28,4 +29,5 @@ urlpatterns = [
     path('api/createRoom', create_room, name='create_room'),
     path('api/getBackgroundImage/<str:file_name>', get_background_image, name='get_background_image'),
     path('api/getBackgroundImageWithId/<str:room_id>', get_background_image_with_room_id, name='get_background_image_with_id'),
+    path('api/getCreatorName/<str:user_id>', get_creator_name, name='get_creator_name'),
 ]

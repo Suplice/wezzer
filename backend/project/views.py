@@ -23,10 +23,25 @@ def get_rooms(request):
     try:
         response = supabase.table("project_rooms").select("*").execute()
 
+
+
         return JsonResponse(response.data, safe=False)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-    
+def get_rooms_with_creator(request):
+    supabase = get_supabase_client()
+    try:
+        response = (
+            supabase.table("project_rooms")
+            .select("RoomId, Name, Description, backgroundImage, CreatorId, project_users!project_room_CreatorId_id_f4c815f9_fk_project_user_UserId(Nickname)")
+            .execute()
+        )
+
+        rooms = response.data
+
+        return JsonResponse(rooms, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 @csrf_exempt
 def register_user(request):
     if request.method != "POST":
@@ -278,3 +293,16 @@ def get_background_image_with_room_id(request, room_id):
     except FileNotFoundError:
         return HttpResponse("File not found", status=404)
 
+
+def get_creator_name(request, user_id):
+
+    credentials = request.COOKIES.get("authToken")
+    if not credentials:
+        return JsonResponse({"error": "No token provided"}, status=401)
+
+    try:
+        supabase = get_supabase_client()
+        response = supabase.table("project_users").select("Nickname").eq("UserId", user_id).execute()
+        return JsonResponse(response.data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

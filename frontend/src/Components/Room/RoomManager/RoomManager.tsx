@@ -27,15 +27,32 @@ const RoomManager: React.FC = () => {
   useEffect(() => {
     const getRooms = async () => {
       setRoomsLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_DJANGO_URL}/api/rooms`,
-        {}
-      );
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_DJANGO_URL}/api/getRoomsWithCreator`,
+          {}
+        );
 
-      if (response.ok) {
-        const data = await response.json();
-        setRooms(data);
-        setRoomsLoading(false);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          const mappedRooms: Room[] = data.map((roomData: any) => ({
+            RoomId: roomData.RoomId,
+            Description: roomData.Description,
+            Name: roomData.Name,
+            backgroundImage: roomData.backgroundImage,
+            CreatorId: roomData.CreatorId,
+            creatorName: roomData.project_users?.Nickname || "Unknown",
+          }));
+
+          setRooms(mappedRooms);
+          setRoomsLoading(false);
+        } else {
+          const error = await response.json();
+          console.error("Error fetching rooms:", error);
+        }
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
       }
     };
 
@@ -51,7 +68,7 @@ const RoomManager: React.FC = () => {
           roomName={room.Name}
           roomDescription={room.Description}
           roomBackground={room.backgroundImage}
-          roomCreator={room.CreatorId}
+          roomCreator={room.creatorName}
           roomCreaterAvatar={""}
           roomId={room.RoomId}
           onClick={() => handleJoinRoom(room.RoomId, room.Name)}

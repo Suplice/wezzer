@@ -4,6 +4,7 @@ export type Room = {
   Name: string;
   backgroundImage: string;
   CreatorId: string;
+  creatorName: string;
 };
 
 export type RegisterData = {
