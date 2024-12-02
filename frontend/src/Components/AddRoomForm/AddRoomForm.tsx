@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 interface AddRoomFormProps {
   onClose: () => void;
@@ -19,9 +20,22 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   const [dragStatus, setDragStatus] = useState<"default" | "valid" | "invalid">(
     "default"
   );
+
+  const { user } = useAuth();
+
+  const handleButtonState = () => {
+    if (!user?.id) {
+      return "NotAuthenticated";
+    }
+
+    return "Enabled";
+  };
+
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [buttonState, setButtonState] = useState<
+    "Disabled" | "Enabled" | "NotAuthenticated"
+  >(handleButtonState);
 
   const navigate = useNavigate();
 
@@ -39,7 +53,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   });
 
   const AddRoomValidation = async (data: any) => {
-    setButtonDisabled(true);
+    setButtonState("Disabled");
 
     const fileName = selectedFile ? selectedFile.name : "Logo.jpg";
 
@@ -73,7 +87,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
         console.error(result);
       }
 
-      setButtonDisabled(false);
+      setButtonState("Enabled");
     } catch (error) {
       console.error(error);
     }
@@ -248,7 +262,11 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Create
+              {buttonState === "Disabled"
+                ? "Creating..."
+                : buttonState === "NotAuthenticated"
+                ? "Login"
+                : "Create"}
             </button>
           </div>
         </form>
