@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const SignIn: React.FC = () => {
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [buttonState, setButtonState] = useState<"Disabled" | "Enabled">();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const SignIn: React.FC = () => {
       return;
     }
 
-    setButtonDisabled(true);
+    setButtonState("Disabled");
     const response = await signInWithEmailAndPassword(data);
     if (!response.result) {
       toast.error(response.message);
@@ -47,7 +47,7 @@ const SignIn: React.FC = () => {
       navigate("/");
     }
 
-    setButtonDisabled(false);
+    setButtonState("Enabled");
   };
 
   const navigateToMainPage = () => {
@@ -121,12 +121,14 @@ const SignIn: React.FC = () => {
 
             <button
               type="submit"
-              disabled={buttonDisabled}
+              disabled={buttonState === "Disabled"}
               className={`mt-6 border h-12 rounded-md bg-cyan-500 hover:bg-cyan-600 transition-all duration-150 text-xl font-semibold ${
-                buttonDisabled ? "bg-gray-400 hover:bg-gray-500" : ""
+                buttonState === "Disabled"
+                  ? "bg-gray-400 hover:bg-gray-500"
+                  : ""
               }`}
             >
-              Sign In
+              {buttonState === "Disabled" ? "Signing in..." : "Sign In"}
             </button>
           </form>
           <button className="border h-12 rounded-md bg-blue-400 w-full mt-6 font-semibold text-xl hover:bg-blue-500 transition-all duration-150">
