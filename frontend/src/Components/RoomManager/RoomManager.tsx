@@ -3,6 +3,8 @@ import RoomCard from "../RoomCard/RoomCard";
 import { Room } from "../../utils/models";
 import RoomsLoading from "../RoomsLoading/RoomsLoading";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
+import { toast } from "react-toastify";
 
 const RoomManager: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -10,8 +12,16 @@ const RoomManager: React.FC = () => {
 
   const navigate = useNavigate();
 
+  const { user } = useAuth();
+
   const handleJoinRoom = async (roomId: string, roomName: string) => {
-    navigate(`/r/${roomId}/${roomName}`);
+    if (!user?.id) {
+      toast.error("You firstly need to login to join a room", {
+        autoClose: 2000,
+      });
+    } else {
+      navigate(`/r/${roomId}/${roomName}`);
+    }
   };
 
   useEffect(() => {
