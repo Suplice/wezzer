@@ -173,7 +173,6 @@ const RoomBody: React.FC = () => {
       const currentParticipants = participants.map((p) => p.UserId);
       const newParticipantIds = newParticipants.map((p: any) => p.UserId);
 
-      // Dodawanie nowych uczestników
       for (const participant of newParticipants) {
         if (
           !currentParticipants.includes(participant.UserId) &&
@@ -186,27 +185,22 @@ const RoomBody: React.FC = () => {
           );
           const peerConnection = createPeerConnection(participant.UserId);
 
-          // Dodawanie lokalnych tracków
           localStreamRef.current.getTracks().forEach((track) => {
             peerConnection.addTrack(track, localStreamRef.current!);
           });
 
-          // Obsługa ICE candidate
           peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
-              // Wysyłanie kandydata ICE do drugiego użytkownika
               sendSignal("ice-candidate", participant.UserId, event.candidate);
             }
           };
 
-          // Tworzenie oferty
           const offer = await peerConnection.createOffer();
           await peerConnection.setLocalDescription(offer);
           sendSignal("offer", participant.UserId, offer);
         }
       }
 
-      // Usuwanie nieaktywnych uczestników
       const disconnectedParticipants = currentParticipants.filter(
         (id) => !newParticipantIds.includes(id)
       );
@@ -218,7 +212,6 @@ const RoomBody: React.FC = () => {
         }
       }
 
-      // Aktualizacja listy uczestników
       setParticipants(newParticipants);
     };
 
