@@ -90,10 +90,10 @@ class RoomConsumer(AsyncWebsocketConsumer):
                     "message": "User authenticated successfully",
                     "data": result
                 }))
-                return
             else:
                 await self.send(json.dumps({"error": "Authentication failed"}))
                 await self.close()
+                return
 
         # Handle other types of messages (e.g., signaling messages)
         message_type = data.get("type")
