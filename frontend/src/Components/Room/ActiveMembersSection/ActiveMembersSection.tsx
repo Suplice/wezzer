@@ -23,7 +23,7 @@ const ActiveMembersSection: React.FC<ActiveMembersSectionProps> = ({
           <div className="flex flex-row flex-wrap px-5 py-5 gap-6 md:gap-x-12 gap-y-6 overflow-hidden items-center justify-center ">
             {users.map((user) => (
               <ActiveUser
-                key={user.userId}
+                key={user.UserId}
                 name={user.Nickname}
                 isActive={false}
               />
