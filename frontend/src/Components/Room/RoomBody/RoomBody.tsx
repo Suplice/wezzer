@@ -93,7 +93,6 @@ const RoomBody: React.FC = () => {
             updatePeers(data.data);
             break;
           case "offer":
-          case "offer":
             console.log(`Odebrano ofertę od użytkownika ${data.sender}`);
             const peerConnection = createPeerConnection(data.sender);
             console.log("oferta", data);
@@ -161,8 +160,6 @@ const RoomBody: React.FC = () => {
             console.log("Uczestnik opuścił pokój:", data.data);
             updatePeers(data.data);
             break;
-          default:
-            console.warn("Nieobsługiwany typ wiadomości:", data.type);
         }
       };
     };
@@ -179,19 +176,30 @@ const RoomBody: React.FC = () => {
       // Dodawanie nowych uczestników
       for (const participant of newParticipants) {
         if (
-          !currentParticipants.includes(participant.userId) &&
+          !currentParticipants.includes(participant.UserId) &&
           user &&
-          participant.userId !== user.id &&
+          participant.UserId !== user.id &&
           localStreamRef.current
         ) {
           console.log(
             `Tworzenie połączenia z nowym uczestnikiem: ${participant.UserId}`
           );
           const peerConnection = createPeerConnection(participant.UserId);
+
+          // Dodawanie lokalnych tracków
           localStreamRef.current.getTracks().forEach((track) => {
             peerConnection.addTrack(track, localStreamRef.current!);
           });
 
+          // Obsługa ICE candidate
+          peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+              // Wysyłanie kandydata ICE do drugiego użytkownika
+              sendSignal("ice-candidate", participant.UserId, event.candidate);
+            }
+          };
+
+          // Tworzenie oferty
           const offer = await peerConnection.createOffer();
           await peerConnection.setLocalDescription(offer);
           sendSignal("offer", participant.UserId, offer);
@@ -210,6 +218,7 @@ const RoomBody: React.FC = () => {
         }
       }
 
+      // Aktualizacja listy uczestników
       setParticipants(newParticipants);
     };
 
