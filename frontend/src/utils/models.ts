@@ -32,6 +32,6 @@ export type LoginData = {
 };
 
 export type Participant = {
-  userId: string;
+  UserId: string;
   Nickname: string;
 };
