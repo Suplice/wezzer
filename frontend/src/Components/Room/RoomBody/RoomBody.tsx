@@ -214,7 +214,8 @@ const RoomBody: React.FC = () => {
             break;
           case "user_joined":
             console.log("Nowy uczestnik dołączył:", data.data);
-            updatePeers(data.data);
+            handleNewParticipant(data.data);
+            //updatePeers(data.data);
             break;
           case "user_left":
             console.log("Uczestnik opuścił pokój:", data.data);
@@ -251,7 +252,10 @@ const RoomBody: React.FC = () => {
 
           peerConnection.onicecandidate = (event) => {
             if (event.candidate) {
+              console.log("Generowany kandydat ICE:", event.candidate);
               sendSignal("ice-candidate", participant.UserId, event.candidate);
+            } else {
+              console.log("ICE gathering zakończone.");
             }
           };
 
@@ -283,15 +287,32 @@ const RoomBody: React.FC = () => {
         console.log("Strumień audio użytkownika został uzyskany.");
         localStreamRef.current = stream;
 
+        // Teraz dla wszystkich uczestników w pokoju, którzy już są w pokoju, dodaj strumień
         for (const participant of currentParticipants) {
-          if (user && participant.UserId === user.id) continue;
-          console.log(
-            `Inicjalizacja połączenia z uczestnikiem: ${participant.UserId}`
-          );
-          const peerConnection = createPeerConnection(participant.UserId);
-          stream.getTracks().forEach((track) => {
-            peerConnection.addTrack(track, stream);
-          });
+          if (user && participant.UserId === user.id) continue; // Ignoruj siebie
+          console.log(participant.UserId);
+          if (peerConnections[participant.UserId]) {
+            console.log(
+              `Dodaję strumień audio do istniejącego połączenia z: ${participant.UserId}`
+            );
+            // Dodaj strumień audio do istniejącego połączenia
+            stream.getTracks().forEach((track) => {
+              peerConnections[participant.UserId].addTrack(track, stream);
+            });
+          } else {
+            console.log(
+              `Inicjalizacja połączenia z uczestnikiem: ${participant.UserId}`
+            );
+            const peerConnection = createPeerConnection(participant.UserId);
+            stream.getTracks().forEach((track) => {
+              peerConnection.addTrack(track, stream);
+            });
+
+            // Tworzenie oferty (send offer to new user)
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            sendSignal("offer", participant.UserId, offer);
+          }
         }
       } catch (err) {
         console.error("Błąd przy uzyskiwaniu mikrofonu:", err);
@@ -313,7 +334,7 @@ const RoomBody: React.FC = () => {
 
       peerConnection.ontrack = (event) => {
         console.log(
-          `Odebrano dźwięk od uczestnika. Źródło strumienia:`,
+          `Odebrano strumień audio od uczestnika ${participantId}:`,
           event.streams[0]
         );
         const remoteAudio = document.createElement("audio");
@@ -335,6 +356,33 @@ const RoomBody: React.FC = () => {
           payload,
         })
       );
+    };
+
+    const handleNewParticipant = async (updatedParticipants: any) => {
+      console.log("odebrano stru212121", updatedParticipants);
+
+      // Iterujemy po wszystkich uczestnikach w zaktualizowanej liście
+      for (const participant of updatedParticipants) {
+        if (participant.UserId === user?.id) continue; // Ignoruj siebie
+        // Dla każdego uczestnika tworzysz połączenie
+        console.log("odebrano stru", participant);
+        const peerConnection = createPeerConnection(participant.UserId);
+
+        console.log("odebrano stru local strteam ref", localStreamRef.current);
+
+        // Dodajemy strumień lokalny do połączenia
+        localStreamRef.current!.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, localStreamRef.current!);
+        });
+
+        // Tworzymy ofertę i wysyłamy ją do danego uczestnika
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendSignal("offer", participant.UserId, offer); // Wysyłamy ofertę do każdego uczestnika
+      }
+
+      // Opcjonalnie możesz zaktualizować stan z nową listą uczestników, jeśli chcesz
+      setParticipants(updatedParticipants);
     };
 
     checkIdentity();
