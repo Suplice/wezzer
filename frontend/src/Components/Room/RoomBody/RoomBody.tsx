@@ -7,15 +7,19 @@ import { useAuth } from "../../../Context/AuthContext";
 import { Participant } from "../../../utils/models";
 import { toast } from "react-toastify";
 
+interface ExtendedRTCPeerConnection extends RTCPeerConnection {
+  iceCandidateBuffer?: RTCIceCandidate[];
+}
+
 const RoomBody: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const [isLoading, setIsLoading] = useState(true);
+  const peerConnections: { [id: string]: ExtendedRTCPeerConnection } = {};
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const { user } = useAuth();
   const socketRef = useRef<WebSocket | null>(null);
-  const peerConnections: { [id: string]: RTCPeerConnection } = {};
   const localStreamRef = useRef<MediaStream>();
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -94,11 +98,48 @@ const RoomBody: React.FC = () => {
             break;
           case "offer":
             console.log(`Odebrano ofertę od użytkownika ${data.sender}`);
-            const peerConnection = createPeerConnection(data.sender);
-            console.log("oferta", data);
+
+            // Tworzenie połączenia i zapis w obiekcie peerConnections
+            const peerConnection: ExtendedRTCPeerConnection =
+              createPeerConnection(data.sender);
+            peerConnections[data.sender] = peerConnection;
+            console.log("Oferta", data);
 
             try {
-              await peerConnection.setRemoteDescription(data.payload);
+              const remoteDescription = new RTCSessionDescription({
+                type: data.payload.type, // "offer" lub "answer"
+                sdp: data.payload.sdp, // String SDP
+              });
+
+              await peerConnection.setRemoteDescription(remoteDescription);
+              console.log(
+                `remoteDescription ustawione dla użytkownika: ${data.sender}`
+              );
+
+              // Przetwarzanie buforowanych kandydatów ICE
+              if (
+                peerConnection.iceCandidateBuffer &&
+                peerConnection.iceCandidateBuffer.length > 0
+              ) {
+                console.log(
+                  `Przetwarzanie ${peerConnection.iceCandidateBuffer.length} buforowanych kandydatów ICE.`
+                );
+                for (const candidate of peerConnection.iceCandidateBuffer) {
+                  try {
+                    await peerConnection.addIceCandidate(candidate);
+                    console.log(
+                      "Dodano buforowanego kandydata ICE:",
+                      candidate
+                    );
+                  } catch (error) {
+                    console.error(
+                      "Błąd podczas dodawania buforowanego kandydata ICE:",
+                      error
+                    );
+                  }
+                }
+                peerConnection.iceCandidateBuffer = []; // Czyszczenie bufora po przetworzeniu
+              }
 
               const answer = await peerConnection.createAnswer();
               await peerConnection.setLocalDescription(answer);
@@ -110,7 +151,7 @@ const RoomBody: React.FC = () => {
             break;
           case "answer":
             console.log(`Odebrano odpowiedź od użytkownika ${data.sender}`);
-            console.log("odpowiedź", data);
+            console.log("Odpowiedź", data);
             const pc = peerConnections[data.sender];
             if (pc) {
               try {
@@ -129,15 +170,34 @@ const RoomBody: React.FC = () => {
           case "ice-candidate":
             console.log(`Odebrano kandydata ICE od użytkownika ${data.sender}`);
             console.log("dane odebrane to", data);
+
             const pcIce = peerConnections[data.sender];
             if (pcIce) {
               try {
-                const iceCandidate = {
+                const iceCandidate = new RTCIceCandidate({
                   candidate: data.payload.candidate,
                   sdpMLineIndex: data.payload.sdpMLineIndex,
                   sdpMid: data.payload.sdpMid,
-                };
-                await pcIce.addIceCandidate(new RTCIceCandidate(iceCandidate));
+                });
+
+                // Sprawdź, czy remoteDescription jest ustawiona
+                if (
+                  pcIce.remoteDescription &&
+                  pcIce.remoteDescription.type &&
+                  data.payload.candidate
+                ) {
+                  await pcIce.addIceCandidate(iceCandidate);
+                  console.log("Dodano kandydata ICE.");
+                } else {
+                  // Jeśli remoteDescription nie jest ustawione, dodaj do bufora
+                  if (!pcIce.iceCandidateBuffer) {
+                    pcIce.iceCandidateBuffer = [];
+                  }
+                  pcIce.iceCandidateBuffer.push(iceCandidate);
+                  console.log(
+                    "Kandydat ICE dodany do bufora, ponieważ remoteDescription jest null."
+                  );
+                }
               } catch (error) {
                 console.error("Błąd podczas dodawania kandydata ICE:", error);
               }
@@ -224,6 +284,7 @@ const RoomBody: React.FC = () => {
         localStreamRef.current = stream;
 
         for (const participant of currentParticipants) {
+          if (user && participant.UserId === user.id) continue;
           console.log(
             `Inicjalizacja połączenia z uczestnikiem: ${participant.UserId}`
           );
@@ -283,6 +344,14 @@ const RoomBody: React.FC = () => {
     return () => {
       console.log("Zamykanie połączeń i czyszczenie zasobów.");
       Object.values(peerConnections).forEach((pc) => pc.close());
+
+      for (const userId in peerConnections) {
+        peerConnections[userId].close();
+        delete peerConnections[userId];
+      }
+
+      document.querySelectorAll("audio").forEach((audio) => audio.remove());
+
       socketRef.current?.close();
     };
   }, []);
