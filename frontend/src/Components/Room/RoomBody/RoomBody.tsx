@@ -209,13 +209,13 @@ const RoomBody: React.FC = () => {
               data.data
             );
             getLocalStream(data.data);
-            updatePeers(data.data);
+            handleNewParticipant(data.data);
             setIsLoading(false);
             break;
           case "user_joined":
             console.log("Nowy uczestnik dołączył:", data.data);
-            handleNewParticipant(data.data);
-            //updatePeers(data.data);
+
+            updatePeers(data.data);
             break;
           case "user_left":
             console.log("Uczestnik opuścił pokój:", data.data);
@@ -234,6 +234,7 @@ const RoomBody: React.FC = () => {
       const currentParticipants = participants.map((p) => p.UserId);
       const newParticipantIds = newParticipants.map((p: any) => p.UserId);
 
+      // Dla każdego nowego uczestnika tworzysz połączenie z obecnymi uczestnikami
       for (const participant of newParticipants) {
         if (
           !currentParticipants.includes(participant.UserId) &&
@@ -265,6 +266,7 @@ const RoomBody: React.FC = () => {
         }
       }
 
+      // Usuwanie połączeń z uczestnikami, którzy odeszli
       const disconnectedParticipants = currentParticipants.filter(
         (id) => !newParticipantIds.includes(id)
       );
