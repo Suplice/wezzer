@@ -59,7 +59,7 @@ const RoomCard: React.FC<RoomCardProps> = ({
         <div className="relative bg-gray-400 rounded-xl shadow-lg ">
           <img
             src={imageSrc !== null ? imageSrc : "/public/Logo.jpg"}
-            className="aspect-video w-full rounded-xl"
+            className="aspect-video w-full rounded-xl select-none"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 rounded-xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 backdrop-blur-md ">
             <p className="text-white text-xl font-semibold text-center">

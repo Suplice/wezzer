@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
             src="/LogoLight.jpg"
             alt="logo"
             width="40px"
-            className="rounded-xl flex-shrink-0 hover:cursor-pointer aspect-square"
+            className="rounded-xl flex-shrink-0 hover:cursor-pointer aspect-square select-none"
             onClick={() => {
               window.location.href = "/";
             }}
@@ -67,7 +67,7 @@ const Navbar: React.FC = () => {
                 size={45}
                 color="violet"
                 name={user?.name}
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer select-none"
                 onClick={() => {
                   setMenuOpen((prev) => !prev);
                 }}

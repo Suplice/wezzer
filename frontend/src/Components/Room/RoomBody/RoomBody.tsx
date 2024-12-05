@@ -90,7 +90,6 @@ const RoomBody: React.FC = () => {
       };
 
       socketRef.current.onclose = () => {
-        toast.info("Disconnected from room", { autoClose: 2000 });
         navigate("/");
       };
 
@@ -321,7 +320,7 @@ const RoomBody: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100%-80px)] items-center justify-center relative">
+    <div className="flex flex-col h-[calc(100%-80px)] items-center justify-center relative select-none">
       <img
         className="absolute w-full h-full -z-10"
         src={`${imageSrc ? imageSrc : "/public/Logo.jpg"}`}

@@ -72,7 +72,7 @@ const SignUp: React.FC = () => {
           src="/Logo.jpg"
           alt="logo"
           width="60px"
-          className="rounded-xl flex-shrink-0 hover:cursor-pointer"
+          className="rounded-xl flex-shrink-0 hover:cursor-pointer select-none"
           onClick={() => {
             window.location.href = "/";
           }}
@@ -235,7 +235,7 @@ const SignUp: React.FC = () => {
       <div className="md:w-1/2 hidden md:flex justify-center items-center min-h-screen h-full bg-sky-600 px-5 fixed right-0">
         <img
           src="/SignUpImage.jpg "
-          className="rounded-lg w-[450px] aspect-square"
+          className="rounded-lg w-[450px] aspect-square select-none"
         ></img>
       </div>
     </div>
