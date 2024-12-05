@@ -80,7 +80,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
                     self.room_group_name,
                     {
                         "type": "user_joined",
-                        "data": result,
+                        "data": self.user,
                     }
                 )
 
@@ -128,7 +128,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                     {
                         "type": "user_left",
-                        "data": result,
+                        "data": self.user,
                     }
                 )
 

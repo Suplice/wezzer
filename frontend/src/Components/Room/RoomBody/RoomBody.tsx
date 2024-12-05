@@ -92,10 +92,6 @@ const RoomBody: React.FC = () => {
         console.log("Odebrano wiadomość przez WebSocket:", data);
 
         switch (data.type) {
-          case "participants":
-            console.log("Aktualizacja listy uczestników:", data.data);
-            updatePeers(data.data);
-            break;
           case "offer":
             console.log(`Odebrano ofertę od użytkownika ${data.sender}`);
 
@@ -115,6 +111,15 @@ const RoomBody: React.FC = () => {
               console.log(
                 `remoteDescription ustawione dla użytkownika: ${data.sender}`
               );
+
+              // Dodanie lokalnego audio track
+              const localStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+              localStream.getTracks().forEach((track) => {
+                peerConnection.addTrack(track, localStream);
+              });
+              console.log("Dodano lokalny audio track do peerConnection");
 
               // Przetwarzanie buforowanych kandydatów ICE
               if (
@@ -141,6 +146,7 @@ const RoomBody: React.FC = () => {
                 peerConnection.iceCandidateBuffer = []; // Czyszczenie bufora po przetworzeniu
               }
 
+              // Stworzenie odpowiedzi
               const answer = await peerConnection.createAnswer();
               await peerConnection.setLocalDescription(answer);
 
@@ -209,117 +215,185 @@ const RoomBody: React.FC = () => {
               data.data
             );
             await getLocalStream(data.data);
-
-            await updatePeers(data.data);
             setIsLoading(false);
             break;
           case "user_joined":
             console.log("Nowy uczestnik dołączył:", data.data);
 
-            await updatePeers(data.data);
+            await userJoined(data.data);
             break;
           case "user_left":
             console.log("Uczestnik opuścił pokój:", data.data);
-            await updatePeers(data.data);
+            await userLeft(data.data);
             break;
         }
       };
     };
 
-    const updatePeers = async (newParticipants: any) => {
-      console.log(
-        "Aktualizacja uczestników. Nowi uczestnicy:",
-        newParticipants
-      );
-
-      const currentParticipants = participants.map((p) => p.UserId);
-      const newParticipantIds = newParticipants.map((p: any) => p.UserId);
-
-      // Dla każdego nowego uczestnika tworzysz połączenie z obecnymi uczestnikami
-      for (const participant of newParticipants) {
-        if (
-          !currentParticipants.includes(participant.UserId) &&
-          user &&
-          participant.UserId !== user.id &&
-          localStreamRef.current
-        ) {
-          console.log(
-            `Tworzenie połączenia z nowym uczestnikiem: ${participant.UserId}`
-          );
-          const peerConnection = createPeerConnection(participant.UserId);
-
-          localStreamRef.current.getTracks().forEach((track) => {
-            peerConnection.addTrack(track, localStreamRef.current!);
-          });
-
-          peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-              console.log("Generowany kandydat ICE:", event.candidate);
-              sendSignal("ice-candidate", participant.UserId, event.candidate);
-            } else {
-              console.log("ICE gathering zakończone.");
-            }
-          };
-
-          const offer = await peerConnection.createOffer();
-          await peerConnection.setLocalDescription(offer);
-          sendSignal("offer", participant.UserId, offer);
+    const userLeft = async (leftUser: any) => {
+      console.log("Użytkownik opuścił pokój:", leftUser);
+      if (leftUser.id !== user!.id) {
+        console.log(`Usuwanie połączenia z uczestnikiem: ${leftUser.id}`);
+        if (peerConnections[leftUser.id]) {
+          peerConnections[leftUser.id].close();
+          delete peerConnections[leftUser.id];
         }
       }
-
-      // Usuwanie połączeń z uczestnikami, którzy odeszli
-      const disconnectedParticipants = currentParticipants.filter(
-        (id) => !newParticipantIds.includes(id)
+      setParticipants((prevParticipants) =>
+        prevParticipants.filter((p) => p.UserId !== leftUser.id)
       );
-      for (const userId of disconnectedParticipants) {
-        console.log(`Usuwanie połączenia z uczestnikiem: ${userId}`);
-        if (peerConnections[userId]) {
-          peerConnections[userId].close();
-          delete peerConnections[userId];
-        }
-      }
-
-      setParticipants(newParticipants);
     };
 
-    const getLocalStream = async (currentParticipants: any) => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+    const userJoined = async (newUser: any) => {
+      console.log("nowy uzytkownik", newUser);
+      if (newUser.id !== user!.id) {
+        console.log(`Tworzenie połączenia z nowym uczestnikiem: ${newUser.id}`);
+        const peerConnection = createPeerConnection(newUser.id);
+        console.log("local stream ref", localStreamRef.current);
+
+        localStreamRef.current!.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, localStreamRef.current!);
         });
-        console.log("Strumień audio użytkownika został uzyskany.");
-        localStreamRef.current = stream;
 
-        // Teraz dla wszystkich uczestników w pokoju, którzy już są w pokoju, dodaj strumień
-        for (const participant of currentParticipants) {
-          if (user && participant.UserId === user.id) continue; // Ignoruj siebie
-          console.log(participant.UserId);
-          if (peerConnections[participant.UserId]) {
-            console.log(
-              `Dodaję strumień audio do istniejącego połączenia z: ${participant.UserId}`
-            );
-            // Dodaj strumień audio do istniejącego połączenia
-            stream.getTracks().forEach((track) => {
-              peerConnections[participant.UserId].addTrack(track, stream);
-            });
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            console.log("Generowany kandydat ICE:", event.candidate);
+            sendSignal("ice-candidate", newUser.UserId, event.candidate);
           } else {
-            console.log(
-              `Inicjalizacja połączenia z uczestnikiem: ${participant.UserId}`
-            );
-            const peerConnection = createPeerConnection(participant.UserId);
-            stream.getTracks().forEach((track) => {
-              peerConnection.addTrack(track, stream);
-            });
-
-            // Tworzenie oferty (send offer to new user)
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            sendSignal("offer", participant.UserId, offer);
+            console.log("ICE gathering zakończone.");
           }
-        }
-      } catch (err) {
-        console.error("Błąd przy uzyskiwaniu mikrofonu:", err);
+        };
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendSignal("offer", newUser.id, offer);
       }
+      const newParticipant: Participant = {
+        UserId: newUser.id,
+        Nickname: newUser.nickname,
+      };
+      setParticipants((prevParticipants) => [
+        ...prevParticipants,
+        newParticipant,
+      ]);
+    };
+
+    // const updatePeers = async (newParticipants: any) => {
+    //   console.log(
+    //     "Aktualizacja uczestników. Nowi uczestnicy:",
+    //     newParticipants
+    //   );
+
+    //   const currentParticipants = participants.map((p) => p.UserId);
+    //   const newParticipantIds = newParticipants.map((p: any) => p.UserId);
+
+    //   // Dla każdego nowego uczestnika tworzysz połączenie z obecnymi uczestnikami
+    //   for (const participant of newParticipants) {
+    //     if (
+    //       !currentParticipants.includes(participant.UserId) &&
+    //       user &&
+    //       participant.UserId !== user.id &&
+    //       localStreamRef.current
+    //     ) {
+    //       console.log(
+    //         `Tworzenie połączenia z nowym uczestnikiem: ${participant.UserId}`
+    //       );
+    //       const peerConnection = createPeerConnection(participant.UserId);
+
+    //       localStreamRef.current.getTracks().forEach((track) => {
+    //         peerConnection.addTrack(track, localStreamRef.current!);
+    //       });
+
+    //       peerConnection.onicecandidate = (event) => {
+    //         if (event.candidate) {
+    //           console.log("Generowany kandydat ICE:", event.candidate);
+    //           sendSignal("ice-candidate", participant.UserId, event.candidate);
+    //         } else {
+    //           console.log("ICE gathering zakończone.");
+    //         }
+    //       };
+
+    //       const offer = await peerConnection.createOffer();
+    //       await peerConnection.setLocalDescription(offer);
+    //       sendSignal("offer", participant.UserId, offer);
+    //     }
+    //   }
+
+    //   // Usuwanie połączeń z uczestnikami, którzy odeszli
+    //   const disconnectedParticipants = currentParticipants.filter(
+    //     (id) => !newParticipantIds.includes(id)
+    //   );
+    //   for (const userId of disconnectedParticipants) {
+    //     console.log(`Usuwanie połączenia z uczestnikiem: ${userId}`);
+    //     if (peerConnections[userId]) {
+    //       peerConnections[userId].close();
+    //       delete peerConnections[userId];
+    //     }
+    //   }
+
+    //   setParticipants(newParticipants);
+    // };
+
+    const getLocalStream = async (currentParticipants: any) => {
+      // try {
+      setParticipants(currentParticipants);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      console.log("Strumień audio użytkownika został uzyskany.");
+      localStreamRef.current = stream;
+
+      for (const participant of currentParticipants) {
+        if (
+          participant.UserId === user?.id ||
+          peerConnections[participant.UserId]
+        )
+          continue;
+        const peerConnection = createPeerConnection(participant.UserId);
+        stream.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, stream);
+        });
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        sendSignal("offer", participant.UserId, offer);
+      }
+
+      // Teraz dla wszystkich uczestników w pokoju, którzy już są w pokoju, dodaj strumień
+      //   for (const participant of currentParticipants) {
+      //     if (user && participant.UserId === user.id) continue; // Ignoruj siebie
+      //     console.log(participant.UserId);
+      //     if (peerConnections[participant.UserId]) {
+      //       console.log(
+      //         `Dodaję strumień audio do istniejącego połączenia z: ${participant.UserId}`
+      //       );
+
+      //       // Dodaj strumień audio do istniejącego połączenia
+      //       console.log(
+      //         "dodaje strumien do istniejacego polaczenia z",
+      //         participant.UserId
+      //       );
+      //       stream.getTracks().forEach((track) => {
+      //         peerConnections[participant.UserId].addTrack(track, stream);
+      //       });
+      //     } else {
+      //       console.log(
+      //         `Inicjalizacja połączenia z uczestnikiem: ${participant.UserId}`
+      //       );
+      //       const peerConnection = createPeerConnection(participant.UserId);
+      //       stream.getTracks().forEach((track) => {
+      //         peerConnection.addTrack(track, stream);
+      //       });
+
+      //       // Tworzenie oferty (send offer to new user)
+      //       const offer = await peerConnection.createOffer();
+      //       await peerConnection.setLocalDescription(offer);
+      //       sendSignal("offer", participant.UserId, offer);
+      //     }
+      //   }
+      // } catch (err) {
+      //   console.error("Błąd przy uzyskiwaniu mikrofonu:", err);
+      // }
     };
 
     const createPeerConnection = (participantId: string) => {
