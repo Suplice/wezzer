@@ -208,18 +208,19 @@ const RoomBody: React.FC = () => {
               "Użytkownik zautoryzowany. Lista uczestników:",
               data.data
             );
-            getLocalStream(data.data);
-            handleNewParticipant(data.data);
+            await getLocalStream(data.data);
+
+            await updatePeers(data.data);
             setIsLoading(false);
             break;
           case "user_joined":
             console.log("Nowy uczestnik dołączył:", data.data);
 
-            updatePeers(data.data);
+            await updatePeers(data.data);
             break;
           case "user_left":
             console.log("Uczestnik opuścił pokój:", data.data);
-            updatePeers(data.data);
+            await updatePeers(data.data);
             break;
         }
       };
