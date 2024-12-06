@@ -77,6 +77,7 @@ def register_user(request):
             "sub": userId,
             "email": email,
             "name": name,
+            "guest": False,
         }
         token = jwt.encode(token_payload, os.getenv("DJANGO_SECRET_KEY"), algorithm="HS256")
 
@@ -121,10 +122,11 @@ def sign_In_As_Guest(request):
             "sub": str(userId),
             "email": email,
             "name": name,
+            "guest": True,
         }
         token = jwt.encode(token_payload, os.getenv("DJANGO_SECRET_KEY"), algorithm="HS256")
 
-        response = JsonResponse({"success": True, "message": "Successfully logged in as anonymous user", "userId": str(userId), "name": name, "email": email})
+        response = JsonResponse({"success": True, "message": "Successfully logged in!", "userId": str(userId), "name": name, "email": email})
         response.set_cookie(
             key="authToken",  
             value=token,  
@@ -185,6 +187,7 @@ def login_user(request):
             "sub": user["UserId"],
             "email": user["Email"],
             "name": user["Nickname"],
+            "guest": False,
         }
 
         token = jwt.encode(token_payload, os.getenv("DJANGO_SECRET_KEY"), algorithm="HS256")
@@ -230,14 +233,15 @@ def check_credentials(request):
             "exp": datetime.datetime.now() + datetime.timedelta(days=1),
             "sub": userId,
             "email": user["Email"],
-            "name": user["Nickname"]}
+            "name": user["Nickname"],
+            "guest": payload.get("guest"),}
 
         newToken = jwt.encode(newTokenPayload, os.getenv("DJANGO_SECRET_KEY"), algorithm="HS256")
 
         if not user:
             return JsonResponse({"error": "User not found"}, status=404)
         
-        response = JsonResponse({"success": True, "user": user})
+        response = JsonResponse({"success": True, "user": user, "guest": payload.get("guest")})
         response.set_cookie(
             key="authToken",
             value=newToken,

@@ -20,6 +20,7 @@ const Navbar: React.FC = () => {
       } else {
         toast.error(response.message);
       }
+      naviagte("/login");
       return;
     }
 

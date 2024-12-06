@@ -24,8 +24,11 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   const { user } = useAuth();
 
   const handleButtonState = () => {
+    console.log(user);
     if (!user?.id) {
       return "NotAuthenticated";
+    } else if (user?.guest) {
+      return "Guest";
     }
 
     return "Enabled";
@@ -34,7 +37,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [buttonState, setButtonState] = useState<
-    "Disabled" | "Enabled" | "NotAuthenticated"
+    "Disabled" | "Enabled" | "NotAuthenticated" | "Guest"
   >(handleButtonState);
 
   const navigate = useNavigate();
@@ -259,13 +262,24 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
               Cancel
             </button>
             <button
-              type="submit"
+              onClick={(e) => {
+                if (buttonState === "NotAuthenticated") {
+                  e.stopPropagation();
+                  navigate("/login");
+                } else if (buttonState === "Guest") {
+                  e.stopPropagation();
+                  navigate("/signup");
+                }
+              }}
+              type={buttonState === "Disabled" ? "button" : "submit"}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               {buttonState === "Disabled"
                 ? "Creating..."
                 : buttonState === "NotAuthenticated"
                 ? "Login"
+                : buttonState === "Guest"
+                ? "Sign Up"
                 : "Create"}
             </button>
           </div>

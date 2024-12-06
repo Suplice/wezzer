@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import SocialAuthButtons from "../../SocialAuthButtons/SocialAuthButtons";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,7 +20,26 @@ const SignUp: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const { registerWithEmailAndPassword } = useAuth();
+  const { registerWithEmailAndPassword, signInAsGuest, isAuthenticated } =
+    useAuth();
+
+  const handleSignInAsGuest = async () => {
+    if (isAuthenticated) {
+      toast.error("You are already signed in.");
+      return;
+    }
+
+    setButtonState("Disabled");
+    const response = await signInAsGuest();
+    if (!response.result) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+      navigate("/");
+    }
+
+    setButtonState("Enabled");
+  };
 
   const schema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -203,14 +221,13 @@ const SignUp: React.FC = () => {
               {buttonState === "Disabled" ? "Signing up..." : "Sign Up"}
             </button>
           </form>
-          <button className="border h-12 rounded-md bg-blue-400 w-full mt-6 font-semibold text-xl hover:bg-blue-500 transition-all duration-150">
+          <p className="text-center mt-5 font-semibold">OR</p>
+          <button
+            onClick={handleSignInAsGuest}
+            className="border h-12 rounded-md bg-blue-400 w-full mt-5 font-semibold text-xl hover:bg-blue-500 transition-all duration-150"
+          >
             Sign In as Guest
           </button>
-          <p className="text-center mt-5 font-serif">Or sign up using:</p>
-
-          <div className="w-full">
-            <SocialAuthButtons />
-          </div>
 
           <div className="flex md:flex-row flex-col ">
             <p className="mt-3">Already have an account?</p>

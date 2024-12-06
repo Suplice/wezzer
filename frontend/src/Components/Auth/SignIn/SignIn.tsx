@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import SocialAuthButtons from "../../SocialAuthButtons/SocialAuthButtons";
 import { motion } from "motion/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import * as yup from "yup";
@@ -150,17 +149,14 @@ const SignIn: React.FC = () => {
               {buttonState === "Disabled" ? "Signing in..." : "Sign In"}
             </button>
           </form>
+          <p className="text-center mt-5  font-semibold">OR</p>
           <button
             onClick={handleSignInAsGuest}
-            className="border h-12 rounded-md bg-blue-400 w-full mt-6 font-semibold text-xl hover:bg-blue-500 transition-all duration-150"
+            className="border h-12 rounded-md bg-blue-400 w-full mt-5 font-semibold text-xl hover:bg-blue-500 transition-all duration-150"
           >
             Sign In as Guest
           </button>
-          <p className="text-center mt-5 font-serif">Or sign in using:</p>
 
-          <div className="w-full">
-            <SocialAuthButtons />
-          </div>
           <div className="flex md:flex-row flex-col ">
             <p className="mt-3">Didn't register yet?</p>
             <a

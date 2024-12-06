@@ -278,6 +278,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             name: responseData.user.Nickname,
             email: responseData.user.Email,
             id: responseData.user.UserId,
+            guest: responseData.guest,
           });
 
           setIsAuthenticated(true);
