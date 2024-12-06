@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import random
 import uuid
 import bcrypt
 import jwt
@@ -95,6 +96,67 @@ def register_user(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     
+
+@csrf_exempt
+def sign_In_As_Guest(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+    try:
+        supabase = get_supabase_client()
+
+        userId = uuid.uuid4()
+        email = str(userId) + "@example.com"
+        name = "Guest" + str(random.randint(1, 1000))
+        password = os.getenv("GUEST_PASSWORD")
+        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode("utf-8")
+
+        supabase.table("project_users").insert([
+            {"UserId": str(userId), "Email": email, "Password": hashed_password, "Nickname": name}
+        ]).execute()
+
+        expiration_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+        token_payload = {
+            "exp": expiration_time.timestamp(),  
+            "sub": str(userId),
+            "email": email,
+            "name": name,
+        }
+        token = jwt.encode(token_payload, os.getenv("DJANGO_SECRET_KEY"), algorithm="HS256")
+
+        response = JsonResponse({"success": True, "message": "Successfully logged in as anonymous user", "userId": str(userId), "name": name, "email": email})
+        response.set_cookie(
+            key="authToken",  
+            value=token,  
+            httponly=True,  
+            secure=True, 
+            max_age=60 * 60,
+            samesite="Strict",
+        )
+        return response
+
+
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload"}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+@csrf_exempt
+def sign_Out_As_Guest(request, user_id):
+
+    try:
+        supabase = get_supabase_client()
+
+        supabase.table("project_users").delete().eq("UserId", user_id).execute()
+
+        response = JsonResponse({"success": True, "message": "Successfully logged out"})
+        response.delete_cookie("authToken")
+        return response
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
+
 @csrf_exempt
 def login_user(request):
     if request.method != "POST":

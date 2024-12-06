@@ -16,7 +16,8 @@ const SignIn: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const { signInWithEmailAndPassword, isAuthenticated } = useAuth();
+  const { signInWithEmailAndPassword, isAuthenticated, signInAsGuest } =
+    useAuth();
 
   const schema = yup.object().shape({
     email: yup.string().email().required("Email is required"),
@@ -40,6 +41,24 @@ const SignIn: React.FC = () => {
 
     setButtonState("Disabled");
     const response = await signInWithEmailAndPassword(data);
+    if (!response.result) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+      navigate("/");
+    }
+
+    setButtonState("Enabled");
+  };
+
+  const handleSignInAsGuest = async () => {
+    if (isAuthenticated) {
+      toast.error("You are already signed in.");
+      return;
+    }
+
+    setButtonState("Disabled");
+    const response = await signInAsGuest();
     if (!response.result) {
       toast.error(response.message);
     } else {
@@ -131,7 +150,10 @@ const SignIn: React.FC = () => {
               {buttonState === "Disabled" ? "Signing in..." : "Sign In"}
             </button>
           </form>
-          <button className="border h-12 rounded-md bg-blue-400 w-full mt-6 font-semibold text-xl hover:bg-blue-500 transition-all duration-150">
+          <button
+            onClick={handleSignInAsGuest}
+            className="border h-12 rounded-md bg-blue-400 w-full mt-6 font-semibold text-xl hover:bg-blue-500 transition-all duration-150"
+          >
             Sign In as Guest
           </button>
           <p className="text-center mt-5 font-serif">Or sign in using:</p>

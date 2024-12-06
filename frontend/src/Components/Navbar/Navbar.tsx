@@ -7,12 +7,22 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const Navbar: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, signOutAsGuest } = useAuth();
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
   const naviagte = useNavigate();
 
   const handleLogout = async () => {
+    if (user?.guest) {
+      const response = await signOutAsGuest();
+      if (response.result) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+      return;
+    }
+
     const response = await logout();
     if (response.result) {
       toast.success(response.message);

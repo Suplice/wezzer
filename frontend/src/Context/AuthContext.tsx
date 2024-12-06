@@ -15,6 +15,8 @@ interface AuthContextType {
   registerWithEmailAndPassword: (data: RegisterData) => Promise<ApiResponse>;
   signInWithEmailAndPassword: (data: LoginData) => Promise<ApiResponse>;
   user: User | null;
+  signInAsGuest: () => Promise<ApiResponse>;
+  signOutAsGuest: () => Promise<ApiResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,6 +69,97 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } as ApiResponse;
       }
     } catch (error) {
+      return {
+        message: "An error occurred, please try again later",
+        result: false,
+      } as ApiResponse;
+    }
+  };
+
+  const signOutAsGuest = async () => {
+    setIsAuthenticated(false);
+    setUser(null);
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/signOutAsGuest/${user?.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        console.log(responseData);
+        return {
+          message: responseData.message,
+          result: true,
+          data: responseData,
+        } as ApiResponse;
+      } else {
+        console.error(responseData);
+        return {
+          message: responseData.message,
+          result: true,
+          data: responseData,
+        } as ApiResponse;
+      }
+    } catch (error) {
+      console.error(error);
+      return {
+        message: "An error occurred, please try again later",
+        result: false,
+      } as ApiResponse;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signInAsGuest = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_DJANGO_URL}/api/signInAsGuest`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        console.log(responseData);
+        setUser({
+          name: responseData.name,
+          email: responseData.email,
+          id: responseData.userId,
+          guest: true,
+        });
+        setIsAuthenticated(true);
+        return {
+          message: responseData.message,
+          result: true,
+          data: responseData,
+        } as ApiResponse;
+      } else {
+        console.error(responseData);
+        return {
+          message: responseData.message,
+          result: true,
+          data: responseData,
+        } as ApiResponse;
+      }
+    } catch (error) {
+      console.error(error);
       return {
         message: "An error occurred, please try again later",
         result: false,
@@ -130,8 +223,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
 
     setIsLoading(true);
-
-    console.log("i am here");
 
     try {
       const response = await fetch(
@@ -205,6 +296,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
+        signOutAsGuest,
+        signInAsGuest,
         isAuthenticated,
         login,
         logout,
