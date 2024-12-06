@@ -17,6 +17,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  guest?: boolean;
 };
 
 export type ApiResponse = {
