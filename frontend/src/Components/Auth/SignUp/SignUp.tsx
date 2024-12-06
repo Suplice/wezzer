@@ -239,14 +239,16 @@ const SignUp: React.FC = () => {
             </a>
           </div>
         </motion.div>
-        <div className="font-semibold mt-5 pb-3">
-          &#169; Wezzer 2024, all rights reserved.
-          <a
-            href="localhost:5173"
-            className="text-blue-500 hover:text-blue-700 ml-1"
+        <div className="font-semibold mt-5 pb-3 flex flex-row">
+          <p> &#169; Wezzer 2024, all rights reserved.</p>
+          <p
+            onClick={() => {
+              navigate("/");
+            }}
+            className="text-blue-500 hover:text-blue-700 ml-1 hover:cursor-pointer"
           >
             Wezzer
-          </a>
+          </p>
         </div>
       </div>
       <div className="md:w-1/2 hidden md:flex justify-center items-center min-h-screen h-full bg-sky-600 px-5 fixed right-0">
