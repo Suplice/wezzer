@@ -35,7 +35,6 @@ const RoomManager: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           const mappedRooms: Room[] = data.map((roomData: any) => ({
             RoomId: roomData.RoomId,
             Description: roomData.Description,

@@ -40,8 +40,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
       } catch (error) {
         console.error("Error fetching image:", error);
       }
-
-      console.log("i finished fetching image");
     };
 
     fetchImage();

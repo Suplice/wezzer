@@ -24,7 +24,6 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
   const { user } = useAuth();
 
   const handleButtonState = () => {
-    console.log(user);
     if (!user?.id) {
       return "NotAuthenticated";
     } else if (user?.guest) {
@@ -222,7 +221,6 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({ onClose }) => {
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
                       const file = e.target.files[0];
-                      console.log(file);
                       setSelectedImage(file.name);
                       setSelectedFile(file);
                     }

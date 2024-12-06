@@ -33,6 +33,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const registerWithEmailAndPassword = async (
     data: RegisterData
   ): Promise<ApiResponse> => {
+    if (isAuthenticated) {
+      return {
+        message: "You are already signed in",
+        result: false,
+      } as ApiResponse;
+    }
     try {
       const response = await fetch(
         `${import.meta.env.VITE_DJANGO_URL}/api/register`,
@@ -168,6 +174,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithEmailAndPassword = async (data: LoginData) => {
+    if (isAuthenticated) {
+      return {
+        message: "You are already signed in",
+        result: false,
+      } as ApiResponse;
+    }
     try {
       const response = await fetch(
         `${import.meta.env.VITE_DJANGO_URL}/api/login`,
@@ -189,12 +201,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: data.email,
           id: responseData.user.UserId,
         });
-
-        console.log({
-          name: responseData.user.Nickname,
-          email: data.email,
-          id: responseData.user.UserId,
-        });
         setIsAuthenticated(true);
 
         return {
@@ -203,7 +209,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           data: responseData,
         } as ApiResponse;
       } else {
-        console.error(responseData);
         return {
           message: responseData.error,
           result: false,

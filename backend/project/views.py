@@ -108,7 +108,7 @@ def sign_In_As_Guest(request):
 
         userId = uuid.uuid4()
         email = str(userId) + "@example.com"
-        name = "Guest" + str(random.randint(1, 1000))
+        name = "Guest" + str(random.randint(1, 100000000))
         password = os.getenv("GUEST_PASSWORD")
         hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode("utf-8")
 
