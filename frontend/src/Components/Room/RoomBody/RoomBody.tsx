@@ -14,6 +14,7 @@ interface ExtendedRTCPeerConnection extends RTCPeerConnection {
 const RoomBody: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { user } = useAuth();
+  const [isMuted, setIsMuted] = useState(false);
   const peerConnections: { [id: string]: ExtendedRTCPeerConnection } = {};
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -113,6 +114,9 @@ const RoomBody: React.FC = () => {
               const localStream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
               });
+
+              localStreamRef.current = localStream;
+
               localStream.getTracks().forEach((track) => {
                 peerConnection.addTrack(track, localStream);
               });
@@ -264,8 +268,8 @@ const RoomBody: React.FC = () => {
         )
           continue;
         const peerConnection = createPeerConnection(participant.UserId);
-        stream.getTracks().forEach((track) => {
-          peerConnection.addTrack(track, stream);
+        localStreamRef.current!.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, localStreamRef.current!);
         });
 
         const offer = await peerConnection.createOffer();
@@ -319,6 +323,20 @@ const RoomBody: React.FC = () => {
     };
   }, []);
 
+  const toggleMute = (state: boolean) => {
+    console.log("localStreamRef.current", localStreamRef.current);
+    console.log("state", state);
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        if (track.kind === "audio") {
+          track.enabled = !state;
+        }
+      });
+      setIsMuted(!state);
+    }
+    console.log("localStreamRef.current", localStreamRef.current);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100%-80px)] items-center justify-center relative select-none">
       <img
@@ -327,7 +345,7 @@ const RoomBody: React.FC = () => {
         alt="Background"
       />
       <ActiveMembersSection users={participants} isLoading={isLoading} />
-      <RoomControls />
+      <RoomControls toggleMute={toggleMute} />
     </div>
   );
 };

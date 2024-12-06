@@ -7,7 +7,11 @@ import { TbHeadphonesFilled } from "react-icons/tb";
 import { TbHeadphonesOff } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
-const RoomControls: React.FC = () => {
+interface RoomControlsProps {
+  toggleMute: (state: boolean) => void;
+}
+
+const RoomControls: React.FC<RoomControlsProps> = ({ toggleMute }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
 
@@ -26,7 +30,10 @@ const RoomControls: React.FC = () => {
     >
       <div className="flex flex-row gap-3">
         <div
-          onClick={() => setIsMuted(!isMuted)}
+          onClick={() => {
+            toggleMute(!isMuted);
+            setIsMuted(!isMuted);
+          }}
           className={`h-[45px] w-[45px] rounded-full bg-black flex justify-center items-center hover:cursor-pointer text-white transition-all duration-150 ${
             isMuted
               ? "bg-red-600 hover:bg-red-500"
