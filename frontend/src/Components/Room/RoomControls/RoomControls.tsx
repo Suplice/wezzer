@@ -9,9 +9,13 @@ import { useNavigate } from "react-router-dom";
 
 interface RoomControlsProps {
   toggleMute: (state: boolean) => void;
+  toggleDeafen: () => void;
 }
 
-const RoomControls: React.FC<RoomControlsProps> = ({ toggleMute }) => {
+const RoomControls: React.FC<RoomControlsProps> = ({
+  toggleMute,
+  toggleDeafen,
+}) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
 
@@ -47,7 +51,10 @@ const RoomControls: React.FC<RoomControlsProps> = ({ toggleMute }) => {
           )}
         </div>
         <div
-          onClick={() => setIsDeafened(!isDeafened)}
+          onClick={() => {
+            toggleDeafen();
+            setIsDeafened(!isDeafened);
+          }}
           className={`h-[45px] w-[45px] rounded-full bg-black flex justify-center items-center hover:cursor-pointer text-white transition-all duration-150 ${
             isDeafened
               ? "bg-red-600 hover:bg-red-500"

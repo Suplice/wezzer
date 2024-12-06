@@ -15,6 +15,7 @@ const RoomBody: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { user } = useAuth();
   const [isMuted, setIsMuted] = useState(false);
+  const [isDeafened, setIsDeafened] = useState(false);
   const peerConnections: { [id: string]: ExtendedRTCPeerConnection } = {};
 
   const socketRef = useRef<WebSocket | null>(null);
@@ -290,7 +291,11 @@ const RoomBody: React.FC = () => {
       peerConnection.ontrack = (event) => {
         const remoteAudio = document.createElement("audio");
         remoteAudio.srcObject = event.streams[0];
-        remoteAudio.autoplay = true;
+        if (isDeafened) {
+          remoteAudio.muted = true;
+        } else {
+          remoteAudio.autoplay = true;
+        }
         document.body.appendChild(remoteAudio);
       };
 
@@ -337,6 +342,15 @@ const RoomBody: React.FC = () => {
     console.log("localStreamRef.current", localStreamRef.current);
   };
 
+  const toggleDeafened = () => {
+    const newDeafenedState = !isDeafened;
+    setIsDeafened(newDeafenedState);
+
+    document.querySelectorAll("audio").forEach((audio) => {
+      audio.muted = newDeafenedState;
+    });
+  };
+
   return (
     <div className="flex flex-col h-[calc(100%-80px)] items-center justify-center relative select-none">
       <img
@@ -345,7 +359,7 @@ const RoomBody: React.FC = () => {
         alt="Background"
       />
       <ActiveMembersSection users={participants} isLoading={isLoading} />
-      <RoomControls toggleMute={toggleMute} />
+      <RoomControls toggleMute={toggleMute} toggleDeafen={toggleDeafened} />
     </div>
   );
 };
