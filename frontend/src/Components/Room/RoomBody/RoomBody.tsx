@@ -1,5 +1,5 @@
 // Importy i definicje
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ActiveMembersSection from "../ActiveMembersSection/ActiveMembersSection";
 import RoomControls from "../RoomControls/RoomControls";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,7 +14,7 @@ interface ExtendedRTCPeerConnection extends RTCPeerConnection {
 const RoomBody: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const { user } = useAuth();
-  const [isMuted, setIsMuted] = useState(false);
+  const [, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const peerConnections: { [id: string]: ExtendedRTCPeerConnection } = {};
 
@@ -23,9 +23,6 @@ const RoomBody: React.FC = () => {
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [filteredParticipants, setFilteredParticipants] = useState<
-    Participant[]
-  >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();

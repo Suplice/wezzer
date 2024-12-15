@@ -1,6 +1,6 @@
 import "./AddRoomForm.css";
 import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { FaImages } from "react-icons/fa";
 import { CgPlayListRemove } from "react-icons/cg";
 import * as yup from "yup";

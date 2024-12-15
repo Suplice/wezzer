@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
-import { Tooltip, Button, Avatar } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import { Tooltip, Avatar } from "@mantine/core";
 
 interface RoomCardProps {
   roomId: string;
@@ -19,7 +18,6 @@ const RoomCard: React.FC<RoomCardProps> = ({
   roomDescription,
   roomBackground,
   roomCreator,
-  roomCreaterAvatar,
   onClick,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);

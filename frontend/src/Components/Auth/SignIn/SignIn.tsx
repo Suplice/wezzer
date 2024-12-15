@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { LoginData } from "../../../utils/models";
 import { useAuth } from "../../../Context/AuthContext";
 import { toast } from "react-toastify";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SignIn: React.FC = () => {
   const [buttonState, setButtonState] = useState<"Disabled" | "Enabled">();

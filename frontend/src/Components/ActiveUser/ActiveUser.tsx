@@ -1,5 +1,5 @@
 import { Avatar, Tooltip } from "@mantine/core";
-import React, { useEffect } from "react";
+import React from "react";
 
 interface ActiveUserInterface {
   isActive: boolean;
