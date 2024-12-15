@@ -2,3 +2,4 @@
 backend\__pychcache__\*
 media
 .vercel
+static

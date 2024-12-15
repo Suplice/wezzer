@@ -9,6 +9,7 @@ from supabase import create_client, Client
 from django.http import FileResponse, HttpResponse, JsonResponse
 from dotenv import load_dotenv
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 
 load_dotenv()
@@ -343,7 +344,7 @@ def create_room(request):
 
 
 def get_background_image(request, file_name):
-    file_path = os.path.join(f"media/{file_name}")
+    file_path = os.path.join(f"{settings.MEDIA_ROOT}/{file_name}")
     try:
         return FileResponse(open(file_path, "rb"), content_type="image/jpeg")
     except FileNotFoundError:
