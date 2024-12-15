@@ -1,3 +1,4 @@
 backend/backend/__pycache__/*
 backend/project/__pycache__/*
 backend/project/migrations/__pycache__/*
+.vercel

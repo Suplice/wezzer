@@ -1,8 +1,0 @@
-{
-  "functions": {
-    "backend/*.py": {
-      "runtime": "@vercel/python@4.5.1"
-    }
-  },
-  "routes": [{ "src": "/(.*)", "dest": "backend/asgi.py" }]
-}

@@ -1,3 +1,4 @@
 .env
 backend\__pychcache__\*
 media
+.vercel

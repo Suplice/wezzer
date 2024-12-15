@@ -29,9 +29,6 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -65,7 +62,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'api.urls'
 
 TEMPLATES = [
     {
@@ -83,8 +80,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
-ASGI_APPLICATION = 'backend.asgi.application'
+WSGI_APPLICATION = 'api.wsgi.application'
+ASGI_APPLICATION = 'api.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
@@ -173,9 +170,19 @@ USE_TZ = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://wezzer-steel.vercel.app"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+ALLOWED_HOSTS = [
+    'wezzerapi-qeinav824-mateuszs-projects-f576e133.vercel.app', 
+    'wezzerapi-suplice-mateuszs-projects-f576e133.vercel.app', 
+    'wezzerapi.vercel.app',
+    'localhost',
+    '127.0.0.1',
+    'your-production-domain.com',  
+]
 
 
 CORS_ALLOW_HEADERS = [
