@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Application definition
 
@@ -176,12 +176,8 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
-    'wezzerapi-qeinav824-mateuszs-projects-f576e133.vercel.app', 
-    'wezzerapi-suplice-mateuszs-projects-f576e133.vercel.app', 
     'wezzerapi.vercel.app',
     'localhost',
-    '127.0.0.1',
-    'your-production-domain.com',  
 ]
 
 
