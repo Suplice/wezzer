@@ -176,7 +176,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
-    'wezzerapi.vercel.app',
+    'wezzer-glko.onrender.com',
     'localhost',
 ]
 
