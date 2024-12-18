@@ -153,7 +153,7 @@ def sign_Out_As_Guest(request, user_id):
         supabase.table("project_users").delete().eq("UserId", user_id).execute()
 
         response = JsonResponse({"success": True, "message": "Successfully logged out"})
-        response.delete_cookie("authToken")
+        response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
         return response
     except Exception as e:
         return JsonResponse({"success": False, "message": str(e)}, status=500)
@@ -221,7 +221,7 @@ def check_credentials(request):
 
         if not is_valid:
             response = JsonResponse({"error": "Token has expired"}, status=401)
-            response.delete_cookie("authToken")
+            response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
             return response
 
         userId = payload.get("sub")
@@ -255,11 +255,11 @@ def check_credentials(request):
         return response
     except jwt.ExpiredSignatureError:
         response = JsonResponse({"error": "Token has expired"}, status=401)
-        response.delete_cookie("authToken")
+        response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
         return response
     except jwt.InvalidTokenError:
         response = JsonResponse({"error": "Invalid token"}, status=401)
-        response.delete_cookie("authToken")
+        response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
         return response
     except Exception as e:
         response = JsonResponse({"error": str(e)}, status=500)
@@ -268,7 +268,7 @@ def check_credentials(request):
 @csrf_exempt
 def logout_user(request):
     response = JsonResponse({"success": True, "message": "Logged out successfully"})
-    response.delete_cookie("authToken")
+    response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
     return response
 
 
@@ -288,7 +288,7 @@ def create_room(request):
 
         if not is_valid:
             response = JsonResponse({"error": "Token has expired"}, status=401)
-            response.delete_cookie("authToken")
+            response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
             return response
 
         userId = payload.get("sub")
@@ -331,11 +331,11 @@ def create_room(request):
         return JsonResponse(response.data, safe=False)
     except jwt.ExpiredSignatureError:
         response = JsonResponse({"error": "Token has expired"}, status=401)
-        response.delete_cookie("authToken")
+        response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
         return response
     except jwt.InvalidTokenError:
         response = JsonResponse({"error": "Invalid token"}, status=401)
-        response.delete_cookie("authToken")
+        response.delete_cookie("authToken", httponly = True, secure=True, samesite="None")
         return response
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON payload"}, status=400)
