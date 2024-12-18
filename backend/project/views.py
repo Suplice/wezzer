@@ -89,7 +89,7 @@ def register_user(request):
             httponly=True,  
             secure=True, 
             max_age=24 * 60 * 60,
-            samesite="Strict",
+            samesite="None",
         )
         return response
 
@@ -134,7 +134,7 @@ def sign_In_As_Guest(request):
             httponly=True,  
             secure=True, 
             max_age=60 * 60,
-            samesite="Strict",
+            samesite="None",
         )
         return response
 
@@ -200,7 +200,7 @@ def login_user(request):
             httponly=True,
             secure=True,
             max_age=24 * 60 * 60,
-            samesite="Strict",
+            samesite="None",
         )
         return response
     except json.JSONDecodeError:
@@ -249,7 +249,7 @@ def check_credentials(request):
             httponly=True,
             secure=True,
             max_age=24 * 60 * 60,
-            samesite="Strict",
+            samesite="None",
         )
 
         return response
