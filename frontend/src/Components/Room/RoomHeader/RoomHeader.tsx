@@ -19,12 +19,23 @@ const RoomHeader: React.FC<RoomHeaderInterface> = ({ roomName }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.addEventListener("click", (e) => {
-      if (e.target !== document.getElementById("menu")) {
+    const handleMouseDown = (e: MouseEvent) => {
+      const menu = document.getElementById("menu");
+      const avatar = document.getElementById("avatar");
+      if (
+        menu &&
+        !menu.contains(e.target as Node) &&
+        avatar &&
+        !avatar.contains(e.target as Node)
+      ) {
         setMenuOpen(false);
       }
-    });
-    return document.removeEventListener("click", () => {});
+    };
+    document.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -55,7 +66,7 @@ const RoomHeader: React.FC<RoomHeaderInterface> = ({ roomName }) => {
           name={user?.name}
           className="hover:cursor-pointer select-none"
           onClick={() => {
-            setMenuOpen(!menuOpen);
+            setMenuOpen((prev) => !prev);
           }}
           id="avatar"
         ></Avatar>
@@ -67,6 +78,7 @@ const RoomHeader: React.FC<RoomHeaderInterface> = ({ roomName }) => {
               exit={{ y: -20, opacity: 0, transition: { duration: 0.3 } }}
               onClick={(e) => e.stopPropagation()}
               className={`absolute w-[180px] flex flex-col gap-2 bg-white z-10  rounded-md shadow-lg top-12 right-0 mx-auto p-2 `}
+              id="menu"
             >
               <p className="text-sm text-center">Hello, {user?.name}</p>
               <div>
