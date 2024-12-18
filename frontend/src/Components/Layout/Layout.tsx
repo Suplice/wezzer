@@ -4,6 +4,7 @@ import Home from "../../Pages/Home/Home";
 import Room from "../../Pages/Room/Room";
 import SignIn from "../Auth/SignIn/SignIn";
 import SignUp from "../Auth/SignUp/SignUp";
+import NotFound from "../../Pages/NotFound/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
   {
     // TODO 404 page
     path: "*",
-    element: <div>404</div>,
+    element: <NotFound />,
   },
   {
     path: "/r/:roomId/:roomName",
