@@ -3,3 +3,4 @@ backend/project/__pycache__/*
 backend/project/migrations/__pycache__/*
 .vercel
 frontend/.env.development
+backend/api/__pycache__/settings.cpython-313.pyc
