@@ -2,3 +2,4 @@
 backend\__pychcache__\*
 .vercel
 static
+backend\api\__pycache__\*
