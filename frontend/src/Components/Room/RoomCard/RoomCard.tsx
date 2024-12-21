@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
 import { Tooltip, Avatar } from "@mantine/core";
+import { FiPlus } from "react-icons/fi";
+import { useAuth } from "../../../Context/AuthContext";
 
 interface RoomCardProps {
   roomId: string;
@@ -9,7 +11,9 @@ interface RoomCardProps {
   roomBackground: string;
   roomCreator: string;
   roomCreaterAvatar: string;
+  roomCreatorId: string;
   onClick: (roomId: string) => void;
+  handleDeleteRoom: (roomId: string) => void;
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({
@@ -18,9 +22,13 @@ const RoomCard: React.FC<RoomCardProps> = ({
   roomDescription,
   roomBackground,
   roomCreator,
+  roomCreatorId,
+  handleDeleteRoom,
   onClick,
 }) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -61,6 +69,17 @@ const RoomCard: React.FC<RoomCardProps> = ({
             <p className="text-white text-xl font-semibold text-center">
               {roomDescription}
             </p>
+            {roomCreatorId === user?.id && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteRoom(roomId);
+                }}
+                className="absolute  right-0 top-0 m-4 bg-red-400 rounded-xl w-6 h-6 flex items-center justify-center hover:bg-red-500 transition-all hover:w-10"
+              >
+                <FiPlus color="white" className="rotate-45" />
+              </div>
+            )}
           </div>
         </div>
 
