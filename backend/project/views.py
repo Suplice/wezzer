@@ -44,6 +44,19 @@ def get_rooms_with_creator(request):
         return JsonResponse(rooms, safe=False)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+@csrf_exempt    
+def delete_room(request, room_id):
+    if request.method != "DELETE":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+    try:
+        supabase = get_supabase_client()
+        response = supabase.table("project_rooms").delete().eq("RoomId", room_id).execute()
+        return JsonResponse(response.data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 @csrf_exempt
 def register_user(request):
     if request.method != "POST":
