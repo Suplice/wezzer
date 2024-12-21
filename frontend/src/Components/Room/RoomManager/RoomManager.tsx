@@ -5,11 +5,12 @@ import RoomsLoading from "../RoomsLoading/RoomsLoading";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../Context/AuthContext";
 import { toast } from "react-toastify";
+import { ThreeDot } from "react-loading-indicators";
 
 const RoomManager: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomsLoading, setRoomsLoading] = useState(true);
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -65,28 +66,50 @@ const RoomManager: React.FC = () => {
     );
 
     if (result) {
-      const response = await fetch(
-        `${import.meta.env.VITE_DJANGO_URL}/api/deleteRoom/${roomId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      setIsDeleting(true);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_DJANGO_URL}/api/deleteRoom/${roomId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      if (response.ok) {
-        const updatedRooms = rooms.filter((room) => room.RoomId !== roomId);
-        setRooms(updatedRooms);
-        toast.success("Room deleted successfully", {
-          autoClose: 2000,
-        });
-      } else {
-        const error = await response.json();
-        console.error("Error deleting room:", error);
-        toast.error("Error deleting room", {
-          autoClose: 2000,
-        });
+        if (response.ok) {
+          const updatedRooms = rooms.filter((room) => room.RoomId !== roomId);
+          setRooms(updatedRooms);
+          toast.success("Room deleted successfully", {
+            autoClose: 2000,
+          });
+        } else {
+          const error = await response.json();
+          console.error(
+            "An error occured while trying to delete room, please try again.:",
+            error
+          );
+          toast.error(
+            "An error occured while trying to delete room, please try again.",
+            {
+              autoClose: 2000,
+            }
+          );
+        }
+      } catch (error) {
+        console.error(
+          "An error occured while trying to delete room, please try again.:",
+          error
+        );
+        toast.error(
+          "An error occured while trying to delete room, please try again.",
+          {
+            autoClose: 2000,
+          }
+        );
+      } finally {
+        setIsDeleting(false);
       }
     }
   };
@@ -108,6 +131,17 @@ const RoomManager: React.FC = () => {
           onClick={() => handleJoinRoom(room.RoomId, room.Name)}
         />
       ))}
+      {isDeleting && (
+        <div className="fixed inset-0 backdrop-blur-sm backdrop-filter z-20 flex items-center justify-center text-white text-2xl font-semibold bg-black bg-opacity-50">
+          <ThreeDot
+            variant="pulsate"
+            color="#000000"
+            size="large"
+            text="Deleting..."
+            textColor="#000000"
+          />
+        </div>
+      )}
     </div>
   );
 };
