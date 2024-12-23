@@ -5,6 +5,7 @@ import AddRoomForm from "../AddRoomForm/AddRoomForm";
 import { AnimatePresence } from "motion/react";
 import "../../index.css";
 import ReportBug from "../ReportBug/ReportBug";
+import ReportBugMenu from "../ReportBugMenu/ReportBugMenu";
 
 const MainField: React.FC = () => {
   const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -41,6 +42,7 @@ const MainField: React.FC = () => {
       </div>
       <AnimatePresence>
         {isAddFormVisible && <AddRoomForm onClose={closeForm} />}
+        {isReportBugVisible && <ReportBugMenu />}
       </AnimatePresence>
 
       <ReportBug handleOpenModal={handleOpenReportBugMenu} />
