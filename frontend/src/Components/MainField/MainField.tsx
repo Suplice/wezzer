@@ -7,12 +7,17 @@ import "../../index.css";
 import ReportBug from "../ReportBug/ReportBug";
 
 const MainField: React.FC = () => {
-  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isAddFormVisible, setIsAddFormVisible] = useState(false);
+  const [isReportBugVisible, setIsReportBugVisible] = useState(false);
 
-  useEffect(() => {}, [isFormVisible]);
+  useEffect(() => {}, [isAddFormVisible]);
 
   const closeForm = () => {
-    setIsFormVisible(false);
+    setIsAddFormVisible(false);
+  };
+
+  const handleOpenReportBugMenu = () => {
+    setIsReportBugVisible(true);
   };
 
   return (
@@ -21,7 +26,7 @@ const MainField: React.FC = () => {
         <div className="flex flex-row justify-between px-6  ">
           <p className="font-semibold text-2xl">Browse Rooms</p>
           <button
-            onClick={() => setIsFormVisible(true)}
+            onClick={() => setIsAddFormVisible(true)}
             className="bg-green-600 rounded-full text-white pr-1 pl-1 sm:pr-3  py-1 flex flex-row gap-3 items-center justify-center hover:bg-green-500 transition-all"
           >
             <p className="rounded-full text-green-600 bg-white p-2 text-center  text-md font-semibold ">
@@ -31,12 +36,14 @@ const MainField: React.FC = () => {
           </button>
         </div>
         <RoomManager />
-        <ReportBug />
+
         <div>dadada</div>
       </div>
       <AnimatePresence>
-        {isFormVisible && <AddRoomForm onClose={closeForm} />}
+        {isAddFormVisible && <AddRoomForm onClose={closeForm} />}
       </AnimatePresence>
+
+      <ReportBug handleOpenModal={handleOpenReportBugMenu} />
     </>
   );
 };
