@@ -4,6 +4,7 @@ import RoomManager from "../Room/RoomManager/RoomManager";
 import AddRoomForm from "../AddRoomForm/AddRoomForm";
 import { AnimatePresence } from "motion/react";
 import "../../index.css";
+import ReportBug from "../ReportBug/ReportBug";
 
 const MainField: React.FC = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
@@ -30,6 +31,8 @@ const MainField: React.FC = () => {
           </button>
         </div>
         <RoomManager />
+        <ReportBug />
+        <div>dadada</div>
       </div>
       <AnimatePresence>
         {isFormVisible && <AddRoomForm onClose={closeForm} />}
