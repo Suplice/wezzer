@@ -1,7 +1,11 @@
 import { motion } from "motion/react";
 import React from "react";
 
-const ReportBugMneu = () => {
+interface ReportBugMenuProps {
+  onClose: () => void;
+}
+
+const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-800 bg-opacity-75 backdrop-blur-md w-full h-full px-2 md:px-0 ">
       <motion.div
@@ -24,7 +28,13 @@ const ReportBugMneu = () => {
             >
               Send
             </button>
-            <button className="py-2 px-4 bg-gray-500 rounded-sm hover:bg-gray-600 transition-all duration-200">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onClose();
+              }}
+              className="py-2 px-4 bg-gray-500 rounded-sm hover:bg-gray-600 transition-all duration-200"
+            >
               Cancel
             </button>
           </div>
@@ -34,4 +44,4 @@ const ReportBugMneu = () => {
   );
 };
 
-export default ReportBugMneu;
+export default ReportBugMenu;

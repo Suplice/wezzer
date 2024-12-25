@@ -21,6 +21,10 @@ const MainField: React.FC = () => {
     setIsReportBugVisible(true);
   };
 
+  const closeReportBugMenu = () => {
+    setIsReportBugVisible(false);
+  };
+
   return (
     <>
       <div className="flex flex-col max-w-[1600px] mx-auto mt-5 h-full min-h-[calc(100vh-92px)] no-scroll ">
@@ -42,7 +46,7 @@ const MainField: React.FC = () => {
       </div>
       <AnimatePresence>
         {isAddFormVisible && <AddRoomForm onClose={closeForm} />}
-        {isReportBugVisible && <ReportBugMenu />}
+        {isReportBugVisible && <ReportBugMenu onClose={closeReportBugMenu} />}
       </AnimatePresence>
 
       <ReportBug handleOpenModal={handleOpenReportBugMenu} />
