@@ -11,13 +11,18 @@ const ReportBugMneu = () => {
         className="xl:w-2/5 lg:w-3/5 md:w-3/5 sm:w-4/5 w-full flex items-center bg-white md:h-3/5 h-4/5 rounded-lg p-3 flex-col   "
       >
         <form>
-          <label>Title</label>
-          <input></input>
-          <label>Description</label>
-          <input></input>
-
-          <button type="submit"> Send </button>
-          <button> Cancel </button>
+          <div className="flex flex-col">
+            <label>Title</label>
+            <input></input>
+            <label>Description</label>
+            <input></input>
+          </div>
+          <div className="flex justify-end flex-row">
+            <button type="submit" className="py-2 px-4 bg-blue-500">
+              Send
+            </button>
+            <button className="py-2 px-4 bg-gray-500"> Cancel </button>
+          </div>
         </form>
       </motion.div>
     </div>
