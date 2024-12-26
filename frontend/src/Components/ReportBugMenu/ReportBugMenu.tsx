@@ -1,11 +1,27 @@
 import { motion } from "motion/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ReportBugMenuProps {
   onClose: () => void;
 }
 
 const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
+  useEffect(() => {
+    document.addEventListener("click", (e) => {
+      if (e.target === document.querySelector(".fixed")) {
+        onClose();
+      }
+    });
+
+    return () => {
+      document.removeEventListener("click", (e) => {
+        if (e.target === document.querySelector(".fixed")) {
+          onClose();
+        }
+      });
+    };
+  });
+
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-800 bg-opacity-75 backdrop-blur-md w-full h-full  ">
       <motion.div
@@ -14,9 +30,16 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
         exit={{ y: -50, opacity: 0, transition: { duration: 0.3 } }}
         className="flex items-center bg-white  rounded-lg p-6 flex-col max-w-[72rem] w-full mx-2 "
       >
-        <div className="flex md:flex-row flex-col w-full h-full bg-blue-500/90 p-12">
-          <div className="w-1/2 text-white text-3xl font-bold">Report Bug</div>
-          <form className="flex flex-col  h-full justify-between w-1/2 bg-white rounded-lg p-6">
+        <div className="flex md:flex-row flex-col w-full h-full bg-blue-500/95 p-12">
+          <div className="w-1/2 text-white flex flex-col gap-4">
+            <h1 className="text-4xl font-bold">Report Bug</h1>
+            <p className="text-md text-wrap max-w-[18rem]">
+              Leave your email and we will try to get back to you within 24
+              hours.
+            </p>
+            <div>Icons</div>
+          </div>
+          <form className="flex flex-col  h-full justify-between w-1/2 bg-white rounded-lg p-6 ">
             <div className="flex flex-col gap-2">
               <label className="text-lg font-semibold flex flex-row">
                 <p>Email </p>
@@ -46,9 +69,9 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
             <div className="flex justify-end flex-row gap-3 ">
               <button
                 type="submit"
-                className="py-2 px-4 bg-white rounded-lg border border-blue-500 hover:border-blue-600 transition-all duration-200 "
+                className="py-2 px-4 bg-white rounded-md border border-blue-500 hover:bg-blue-100/50 transition-all duration-200 text-blue-400 font-semibold mt-3 "
               >
-                Submit
+                Send Message
               </button>
             </div>
           </form>
