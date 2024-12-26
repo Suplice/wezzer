@@ -1,5 +1,8 @@
+import { Tooltip } from "@mantine/core";
 import { motion } from "motion/react";
 import React, { useEffect } from "react";
+import { FaGithub } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 
 interface ReportBugMenuProps {
   onClose: () => void;
@@ -37,7 +40,34 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
               Leave your email and we will try to get back to you within 24
               hours.
             </p>
-            <div>Icons</div>
+            <div className="flex flex-row gap-4 relative z-20">
+              <Tooltip
+                label="Contact me on github"
+                className="z-20"
+                withinPortal
+              >
+                <span>
+                  <FaGithub
+                    color="white"
+                    size={24}
+                    className="hover:cursor-pointer"
+                    onClick={() => window.open("https://github.com/Suplice")}
+                  />
+                </span>
+              </Tooltip>
+              <Tooltip label="Contact me via e-mail" withinPortal>
+                <span>
+                  <MdEmail
+                    color="white"
+                    size={24}
+                    className="hover:cursor-pointer"
+                    onClick={() =>
+                      window.open("mailto:mateuszsuplice@gmail.com")
+                    }
+                  />
+                </span>
+              </Tooltip>
+            </div>
           </div>
           <form className="flex flex-col  h-full justify-between w-1/2 bg-white rounded-lg p-6 ">
             <div className="flex flex-col gap-2">
