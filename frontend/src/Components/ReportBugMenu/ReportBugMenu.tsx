@@ -33,8 +33,8 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
         exit={{ y: -50, opacity: 0, transition: { duration: 0.3 } }}
         className="flex items-center bg-white  rounded-lg p-6 flex-col max-w-[72rem] w-full mx-2 "
       >
-        <div className="flex md:flex-row flex-col w-full h-full bg-blue-500/95 p-12">
-          <div className="w-1/2 text-white flex flex-col gap-4">
+        <div className="flex md:flex-row flex-col w-full h-full bg-blue-500/95 p-12 gap-10 md:gap-0">
+          <div className="md:w-1/2 w-full  text-white flex flex-col gap-4">
             <h1 className="text-4xl font-bold">Report Bug</h1>
             <p className="text-md text-wrap max-w-[18rem]">
               Leave your email and we will try to get back to you within 24
@@ -69,7 +69,7 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
               </Tooltip>
             </div>
           </div>
-          <form className="flex flex-col  h-full justify-between w-1/2 bg-white rounded-lg p-6 ">
+          <form className="flex flex-col  h-full justify-between md:w-1/2 w-full bg-white rounded-lg p-6 ">
             <div className="flex flex-col gap-2">
               <label className="text-lg font-semibold flex flex-row">
                 <p>Email </p>
