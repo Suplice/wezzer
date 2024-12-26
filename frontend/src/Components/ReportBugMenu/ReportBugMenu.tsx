@@ -4,12 +4,15 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 interface ReportBugMenuProps {
   onClose: () => void;
 }
 
 const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.addEventListener("click", (e) => {
       if (e.target === document.querySelector(".fixed")) {
@@ -33,7 +36,8 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
   } = useForm();
 
   const handleSubmitForm = (data: any) => {
-    console.log(data);
+    // TODO: Send email to the backend
+    onClose();
   };
 
   return (
