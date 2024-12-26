@@ -1,6 +1,7 @@
 import { Tooltip } from "@mantine/core";
 import { motion } from "motion/react";
 import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { FaGithub } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 
@@ -24,6 +25,16 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
       });
     };
   });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const handleSubmitForm = (data: any) => {
+    console.log(data);
+  };
 
   return (
     <div className="fixed inset-0 z-20 flex items-center justify-center bg-gray-800 bg-opacity-75 backdrop-blur-md w-full h-full  ">
@@ -69,32 +80,50 @@ const ReportBugMenu: React.FC<ReportBugMenuProps> = ({ onClose }) => {
               </Tooltip>
             </div>
           </div>
-          <form className="flex flex-col  h-full justify-between md:w-1/2 w-full bg-white rounded-lg p-6 ">
-            <div className="flex flex-col gap-2">
+          <form
+            className="flex flex-col  h-full justify-between md:w-1/2 w-full bg-white rounded-lg p-6 "
+            onSubmit={handleSubmit(handleSubmitForm)}
+          >
+            <div className="flex flex-col ">
               <label className="text-lg font-semibold flex flex-row">
                 <p>Email </p>
                 <p className="text-red-500 ml-[3px]">*</p>
               </label>
               <input
+                {...register("email", {
+                  required: true,
+                  pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                })}
                 className="outline-none border rounded-md p-1 px-3 focus:border-blue-400"
                 placeholder="your@email.com"
               ></input>
-              <label className="text-lg font-semibold flex flex-row">
+              {errors.email && (
+                <p className="text-red-500">
+                  Email is required and must be a valid email
+                </p>
+              )}
+              <label className="text-lg font-semibold flex flex-row mt-2">
                 <p>Name </p>
                 <p className="text-red-500 ml-[3px]">*</p>
               </label>
               <input
+                {...register("name", { required: true })}
                 className="outline-none border rounded-md p-1 px-3 focus:border-blue-400"
                 placeholder="Your Name"
               ></input>
-              <label className="text-lg font-semibold flex flex-row">
+              {errors.name && <p className="text-red-500">Name is required</p>}
+              <label className="text-lg font-semibold flex flex-row mt-2">
                 <p>Message</p>
                 <p className="text-red-500 ml-[3px]">*</p>
               </label>
               <textarea
+                {...register("message", { required: true })}
                 className="outline-none border rounded-md p-2 px-3 focus:border-blue-400 resize-none"
                 placeholder="Your Message"
               ></textarea>
+              {errors.message && (
+                <p className="text-red-500">message is required</p>
+              )}
             </div>
             <div className="flex justify-end flex-row gap-3 ">
               <button
